@@ -1,28 +1,26 @@
-import { Sidebar } from "primereact/sidebar";
+import { useState } from "react";
 import { Outlet } from "react-router";
 import { NavItems } from "~/components";
 
 export default function AdminLayout() {
+  const [visible, setVisible] = useState(false);
   return (
     <div className="admin-container">
-      MobileSidebar
-      <aside className="w-full max-w-70 hidden lg:block">
-        {/* <NavItems /> */}
-        <Sidebar
-          onHide={() => {}}
-          visible={true}
-          modal={false} // ❌ حالت modal غیرفعال
-          dismissable={false} // ❌ با کلیک بیرون بسته نشود
-          showCloseIcon={false} // ❌ دکمه بستن مخفی
-          blockScroll={false} // ✅ اسکرول صفحه فعال بماند
-        >
-          <NavItems/>
-        </Sidebar>
+      <aside className="w-full max-w-70 hidden h-screen sticky top-0 bg-white lg:block">
+        <div className="w-full   "><NavItems /></div>
       </aside>
       <aside className="children">
         <Outlet />
       </aside>
-      <main></main>
+      <main>
+        <br />
+                <br />
+        <br />
+        <br />
+        <br />
+        <br />
+
+      </main>
     </div>
   );
 }

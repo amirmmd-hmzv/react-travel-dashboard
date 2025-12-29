@@ -7,13 +7,8 @@ import {
   ScrollRestoration,
 } from "react-router";
 
-import { PrimeReactProvider } from "primereact/api";
-import Tailwind from "primereact/passthrough/tailwind";
-import { twMerge } from "tailwind-merge";
-
 import type { Route } from "./+types/root";
 import "./app.css";
-import { usePassThrough } from "primereact/passthrough";
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -28,8 +23,6 @@ export const links: Route.LinksFunction = () => [
   },
 ];
 
-
-
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
@@ -40,19 +33,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
       </head>
       <body>
-        <PrimeReactProvider
-          value={{
-            ripple: true,
-            pt: Tailwind, // Pass Through پیش‌فرض
-            ptOptions: {
-              mergeSections: true,
-              mergeProps: true,
-              classNameMergeFunction: twMerge,
-            },
-          }}
-        >
-          {children}
-        </PrimeReactProvider>
+        {children}
         <ScrollRestoration />
         <Scripts />
       </body>

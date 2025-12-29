@@ -1,43 +1,54 @@
-@import url("https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,300..900;1,300..900&display=swap");
-@import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap");
+@import url("https://api.fontshare.com/v2/css?f[]=clash-display@400,500,600,700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300..800&display=swap");
 @import "tailwindcss";
-@import 'primeicons/primeicons.css';
-        
-@import 'primereact/resources/themes/lara-light-blue/theme.css';
-
-
-
-
 
 @theme {
-  --font-figtree: "Figtree", sans-serif;
-  --font-inter: "Inter", sans-serif;
-  --color-dark-100: #1f1f36;
-  --color-dark-200: #141627;
-  --color-dark-300: #101828;
-  --color-dark-400: #2e2c48;
-  --color-gray-100: #7f7e83;
-  --color-gray-200: #eaecf0;
-  --color-gray-500: #667085;
-  --color-gray-700: #344054;
-  --color-primary-50: #e9f3fb;
-  --color-primary-100: #256ff1;
-  --color-primary-500: #175cd3;
-  --color-light-100: #ecf2ef;
-  --color-light-200: #f9fbfc;
-  --color-light-300: #f2f4f7;
-  --color-light-400: #ebeeed;
-  --color-light-500: #e3f1ff;
+  /* --font-figtree: "Figtree", sans-serif;
+  --font-inter: "Inter", sans-serif; */
+  --font-clash-display: "Clash Display", sans-serif;
+  --font-plus-jakarta: "Plus Jakarta Sans", sans-serif;
+
+  /* ================= DARK (TEXT / HEADING) ================= */
+  --color-dark-100: #0f172a; /* Main headings */
+  --color-dark-200: #111827;
+  --color-dark-300: #1f2937;
+  --color-dark-400: #334155;
+
+  /* ================= GRAYS ================= */
+  --color-gray-100: #6b7280; /* muted text */
+  --color-gray-200: #e5e7eb; /* borders */
+  --color-gray-500: #64748b;
+  --color-gray-700: #334155;
+
+  /* ================= PRIMARY (TEAL – BRAND) ================= */
+  --color-primary-50: #ecfeff; /* background highlight */
+  --color-primary-100: #0ea5a4; /* main brand */
+  --color-primary-500: #0b8e8c; /* hover / active */
+
+  /* ================= LIGHT / SURFACE ================= */
+  --color-light-100: #ffffff; /* cards */
+  --color-light-200: #f7fafb; /* page bg */
+  --color-light-300: #f1f5f9;
+  --color-light-400: #e2e8f0;
+  --color-light-500: #e6fffa;
+
+  /* ================= SUCCESS ================= */
   --color-success-50: #ecfdf3;
-  --color-success-500: #12b76a;
-  --color-success-700: #027a48;
-  --color-pink-50: #f7edf6;
-  --color-pink-500: #c11574;
-  --color-navy-50: #f0f9ff;
-  --color-navy-500: #026aa2;
-  --color-red-500: #b93815;
-  --color-red-50: #fff4ed;
-  --color-red-100: #ff543d;
+  --color-success-500: #22c55e;
+  --color-success-700: #15803d;
+
+  /* ================= ACCENT (SUNSET CORAL) ================= */
+  --color-pink-50: #fff1f2;
+  --color-pink-500: #ff6b6b;
+
+  /* ================= SECONDARY TEAL ================= */
+  --color-navy-50: #f0fdfa;
+  --color-navy-500: #2dd4bf;
+
+  /* ================= ERROR ================= */
+  --color-red-50: #fff1f2;
+  --color-red-100: #ff8787;
+  --color-red-500: #ef4444;
 
   --background-image-auth: url("/assets/images/auth-img.webp");
   --background-image-hero: url("/assets/images/hero-img.png");
@@ -67,6 +78,20 @@
   --shadow-400: 0px 2px 6px 0px rgba(13, 10, 44, 0.08);
   --shadow-500: 0px 12px 16px -4px rgba(16, 24, 40, 0.1);
   --radius-20: 20px;
+}
+
+@layer base {
+  html,
+  body {
+    font-family: var(--font-plus-jakarta) !important;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-clash-display);
+  }
 }
 
 @layer components {
@@ -278,7 +303,7 @@
     }
   }
   .link-logo {
-    @apply flex items-center gap-1.5 py-10 border-b border-light-100;
+    @apply flex items-center gap-1.5 py-10 border-b border-light-300;
     h1 {
       @apply text-base md:text-2xl font-bold text-dark-100;
     }
@@ -472,8 +497,8 @@
 
 html,
 body {
-  font-family: "Figtree", sans-serif;
-  background-color: #f9fbfc ;
+  font-family: "Plus Jakarta Sans", sans-serif !important;
+  background-color: #f9fbfc !important;
   scroll-behavior: smooth;
 }
 

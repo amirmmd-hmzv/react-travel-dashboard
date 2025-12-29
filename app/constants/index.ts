@@ -1,22 +1,32 @@
-import type { AxisModel } from "@syncfusion/ej2-react-charts";
+// import type { AxisModel } from "@syncfusion/ej2-react-charts";
+import type { JSX, ReactNode } from "react";
+import type { IconType } from "react-icons";
+import { LuHouse , LuUsers,LuEarth } from "react-icons/lu";
 
-export const sidebarItems = [
+type SidebarItem = {
+  id: number;
+  icon: IconType;
+  label: string;
+  href: string;
+};
+
+export const sidebarItems: SidebarItem[] = [
   {
     id: 1,
-    icon: "/assets/icons/home.svg",
+    icon: LuHouse,
     label: "Dashboard",
     href: "/dashboard",
   },
   {
     id: 3,
-    icon: "/assets/icons/users.svg",
-    label: "All Users",
+    icon: LuUsers,
+    label: " Users",
     href: "/all-users",
   },
   {
     id: 4,
-    icon: "/assets/icons/itinerary.svg",
-    label: "AI Trips",
+    icon: LuEarth,
+    label: "Trips",
     href: "/trips",
   },
 ];
@@ -101,26 +111,26 @@ export const comboBoxItems = {
   budget: budgetOptions,
 } as Record<keyof TripFormData, string[]>;
 
-export const userXAxis: AxisModel = { valueType: "Category", title: "Day" };
-export const useryAxis: AxisModel = {
-  minimum: 0,
-  maximum: 10,
-  interval: 2,
-  title: "Count",
-};
+// export const userXAxis: AxisModel = { valueType: "Category", title: "Day" };
+// export const useryAxis: AxisModel = {
+//   minimum: 0,
+//   maximum: 10,
+//   interval: 2,
+//   title: "Count",
+// };
 
-export const tripXAxis: AxisModel = {
-  valueType: "Category",
-  title: "Travel Styles",
-  majorGridLines: { width: 0 },
-};
+// export const tripXAxis: AxisModel = {
+//   valueType: "Category",
+//   title: "Travel Styles",
+//   majorGridLines: { width: 0 },
+// };
 
-export const tripyAxis: AxisModel = {
-  minimum: 0,
-  maximum: 10,
-  interval: 2,
-  title: "Count",
-};
+// export const tripyAxis: AxisModel = {
+//   minimum: 0,
+//   maximum: 10,
+//   interval: 2,
+//   title: "Count",
+// };
 
 export const CONFETTI_SETTINGS = {
   particleCount: 200, // Number of confetti pieces
