@@ -10,12 +10,10 @@ export default function AdminLayout() {
           <NavItems />
         </div>
       </aside>
-      <aside className=" ">
+      <aside className="children">
         <Outlet />
       </aside>
-      <main>
-   
-      </main>
+     
     </div>
   );
 }
