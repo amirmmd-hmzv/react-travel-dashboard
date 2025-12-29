@@ -46,7 +46,7 @@ const MobileSidebar = () => {
         {/* Sidebar Content */}
         <div 
           className={`
-            sidebar-content h-full w-70 rounded-l-lg bg-white  
+            sidebar-content h-full w-70 rounded-l-lg rounded-lg bg-white  
             fixed left-0 top-0 min-h-screen z-10
             transition-transform duration-500 ease-in-out
             ${sidebarVisible ? 'translate-x-0' : '-translate-x-full'}

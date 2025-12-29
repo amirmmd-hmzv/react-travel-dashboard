@@ -31,7 +31,7 @@ const NavItems = () => {
                     <div
                       key={id}
                       className={cn(" group nav-item transition duration-300", {
-                        "bg-primary-100 text-white!": isActive,
+                        "bg-primary-100 text-white! ": isActive,
                       })}
                     >
                       <Icon size={20} />

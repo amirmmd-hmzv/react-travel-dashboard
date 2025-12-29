@@ -1,18 +1,16 @@
-import { useState } from "react";
 import { Outlet } from "react-router";
 import { MobileSidebar, NavItems } from "~/components";
 
 export default function AdminLayout() {
-  const [visible, setVisible] = useState(false);
   return (
-    <div className="admin-container">
+    <div className="admin-layout">
       <MobileSidebar />
-      <aside className="w-full max-w-70 hidden h-screen sticky top-0 bg-white lg:block">
+      <aside className="w-full max-w-70 hidden h-screen sticky top-0 bg-white lg:block rounded-lg">
         <div className="w-full  h-full ">
           <NavItems />
         </div>
       </aside>
-      <aside className="children ">
+      <aside className=" ">
         <Outlet />
       </aside>
       <main>
