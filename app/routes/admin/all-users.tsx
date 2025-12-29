@@ -1,8 +1,7 @@
-import React from 'react'
 
 const AllUsers = () => {
   return (
-    <div>AllUsers</div>
+    <div>Lorem ipsum, dolor sit amet consectetur adipisicing elit. Sequi aliquid neque recusandae vitae pariatur, veritatis ipsa laborum quas omnis odio, natus voluptas cum dolore saepe doloremque ducimus maiores veniam. Vel.</div>
   )
 }
 
