@@ -103,7 +103,7 @@
   }
 
   .stats-card {
-    @apply p-6 flex flex-col gap-6 bg-white shadow-400 rounded-20 text-dark-100;
+    @apply p-6 flex flex-col gap-6 bg-light-100 shadow-500  rounded-lg text-dark-100;
 
     .content {
       @apply flex flex-row md:flex-col-reverse xl:flex-row xl:items-center gap-3 justify-between;
@@ -284,10 +284,16 @@
       }
     }
   }
+  .trip-card::after {
+  content: "";
+  @apply absolute left-0 bottom-0 w-full h-[3px] bg-primary-100
+         opacity-60 transition-all duration-500;
+}
   .trip-card {
-    @apply shadow-300 bg-white rounded-[20px] flex-col w-full relative;
+    @apply shadow-300 bg-white rounded-md flex-col w-full relative hover:-translate-y-0.5 hover:scale-[1.025] hover:shadow-500 ease-out transition duration-500;
+    
     img {
-      @apply w-full h-[160px] rounded-t-xl object-cover aspect-video;
+      @apply w-full rounded-t-xl object-cover aspect-square max-h-50;
     }
     article {
       @apply flex flex-col gap-3 mt-4 pl-[18px] pr-3.5;
@@ -297,7 +303,7 @@
       figure {
         @apply flex items-center gap-2;
         figCaption {
-          @apply text-xs md:text-sm font-normal text-gray-100;
+          @apply text-xs md:text-sm font-medium text-gray-100;
         }
       }
     }
@@ -314,7 +320,7 @@
       @apply size-10 rounded-full aspect-square;
     }
     article {
-      @apply flex flex-col gap-[2px] max-w-[115px];
+      @apply flex flex-col gap-0.5 max-w-28.75;
       h2 {
         @apply text-sm md:text-base font-semibold text-dark-200 truncate;
       }
@@ -488,7 +494,7 @@
     @apply grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-7;
   }
   .nav-item {
-    @apply flex items-center text-xs md:text-lg font-normal cursor-pointer gap-2.5 py-[18px] px-3.5 rounded-lg text-dark-200 hover:bg-primary-100 hover:text-white;
+    @apply flex items-center text-xs md:text-lg font-normal cursor-pointer gap-2.5 py-[18px] px-3.5 rounded-lg text-dark-200 hover:bg-primary-50 hover:text-primary-100;
   }
   .combo-box {
     @apply !p-3.5 !border w-full !border-light-400 !rounded-xl !text-base !text-dark-300 !font-normal;

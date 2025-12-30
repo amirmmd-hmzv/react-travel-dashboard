@@ -1,18 +1,75 @@
+import { Header, StatsCard, TripCard } from "~/components";
+import { dashboardStats, user, allTrips, users } from "~/constants";
 
 const Dashboard = () => {
-  return (
-    <div>Lorem ipsum, dolor sit amet consectetur adipisicing elit. Sequi aliquid
-      neque recusandae vitae pariatur, veritatis ipsa laborum quas omnis odio,
-      natus voluptas cum dolore saepe doloremque ducimus maiores veniam. Vel.Lorem ipsum, dolor sit amet consectetur adipisicing elit. Sequi aliquid
-      neque recusandae vitae pariatur, veritatis ipsa laborum quas omnis odio,
-      natus voluptas cum dolore saepe doloremque ducimus maiores veniam. Vel.Lorem ipsum, dolor sit amet consectetur adipisicing elit. Sequi aliquid
-      neque recusandae vitae pariatur, veritatis ipsa laborum quas omnis odio,
-      natus voluptas cum dolore saepe doloremque ducimus maiores veniam. Vel.Lorem ipsum, dolor sit amet consectetur adipisicing elit. Sequi aliquid
-      neque recusandae vitae pariatur, veritatis ipsa laborum quas omnis odio,
-      natus voluptas cum dolore saepe doloremque ducimus maiores veniam. Vel.Lorem ipsum, dolor sit amet consectetur adipisicing elit. Sequi aliquid
-      neque recusandae vitae pariatur, veritatis ipsa laborum quas omnis odio,
-      natus voluptas cum dolore saepe doloremque ducimus maiores veniam. Vel.</div>
-  )
-}
+  const { totalTrips, totalUsers, tripsCreated, userRole, usersJoined } =
+    dashboardStats;
 
-export default Dashboard
+  return (
+    <main className="dashboard wrapper">
+      <Header
+        title={`Wellcome ${user?.name ?? "Guest"} 👋 `}
+        description={"Let's plan your next adventure"}
+      />
+
+      <section className="flex flex-col gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <StatsCard
+            headTitle="Total Users"
+            total={totalUsers}
+            currentMonthCount={usersJoined.currentMonth}
+            lastMonthCount={usersJoined.lastMonth}
+          />
+
+          <StatsCard
+            headTitle="Total Trips"
+            total={totalTrips}
+            currentMonthCount={tripsCreated.currentMonth}
+            lastMonthCount={tripsCreated.lastMonth}
+          />
+
+          <StatsCard
+            headTitle="Active Users"
+            total={userRole.total}
+            currentMonthCount={userRole.currentMonth}
+            lastMonthCount={userRole.lastMonth}
+          />
+        </div>
+      </section>
+
+      <section className="container">
+        <h1 className="text-xl font-semibold text-dark-100">Trips</h1>
+
+        <div className="trip-grid">
+          {allTrips
+            .slice(0, 4)
+            .map(
+              ({
+                id,
+                estimatedPrice,
+                imageUrls,
+                itinerary,
+                name,
+                tags,
+                travelStyle,
+              }) => {
+                return (
+                  <TripCard
+                    key={id}
+                    id={id.toString()}
+                    name={name}
+                    tags={tags}
+                    imageUrl={imageUrls[0]}
+                    price={estimatedPrice}
+                    location={itinerary?.[0]?.location ?? ""}
+                  />
+                );
+              }
+            )}
+        </div>
+      </section>
+    </main>
+  );
+};
+
+export default Dashboard;
