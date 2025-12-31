@@ -32,7 +32,7 @@ const TripCard = ({
         </figure>
       </article>
 
-      <div className="mt-4 pt-3.5 pl-3.5 pb-4 flex gap-1.5">
+      <div className="mt-4 pt-3.5 pl-3.5 pb-4 flex gap-1.5 border-b border-primary-100">
         {tags.map((tag, index) => (
           <Chip
             key={`tag-${index}`}
@@ -43,6 +43,8 @@ const TripCard = ({
           </Chip>
         ))}
       </div>
+
+      <div className="mt-4  pl-3.5 pb-4  font-semibold font-clash-display tracking-wider text-dark-100 text-sm  lg:text-lg ">From &nbsp;{price}</div>
     </Link>
   );
 };

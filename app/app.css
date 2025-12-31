@@ -284,19 +284,18 @@
       }
     }
   }
-  .trip-card::after {
+/* .trip-card::after {
   content: "";
-  @apply absolute left-0 bottom-0 w-full h-[3px] bg-primary-100
-         opacity-60 transition-all duration-500;
-}
+  @apply absolute left-0 bottom-0 w-full h-0.5 lg:h-1 bg-primary-100;
+} */
   .trip-card {
-    @apply shadow-300 bg-white rounded-md flex-col w-full relative hover:-translate-y-0.5 hover:scale-[1.025] hover:shadow-500 ease-out transition duration-500;
+    @apply shadow-300 bg-white rounded-md flex-col w-full relative  hover:shadow-500 ease-out transition duration-500;
     
     img {
       @apply w-full rounded-t-xl object-cover aspect-square max-h-50;
     }
     article {
-      @apply flex flex-col gap-3 mt-4 pl-[18px] pr-3.5;
+      @apply flex flex-col gap-3 mt-4 pl-4.5 pr-3.5;
       h2 {
         @apply text-sm md:text-lg font-semibold text-dark-100 line-clamp-2;
       }
@@ -485,7 +484,7 @@
     @apply absolute z-10 top-24 bg-white border border-gray-200 rounded-xl shadow-200 h-[250px] w-full md:max-w-[660px] overflow-hidden;
   }
   .tripCard-pill {
-    @apply bg-white py-1 px-2.5 w-fit rounded-[20px] absolute top-2.5 right-4 text-dark-100 text-sm font-semibold;
+    @apply bg-white/90 py-1 px-2.5 w-fit rounded-[20px] absolute top-2.5 right-4 text-dark-100 font-clash-display tracking-wider shadow-200 text-sm font-semibold;
   }
   .price-pill {
     @apply bg-white py-0.5 px-2.5 w-fit rounded-[20px] top-2.5 right-4 text-dark-100 text-sm font-semibold;
