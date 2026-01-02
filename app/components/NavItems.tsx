@@ -1,6 +1,7 @@
+import { logoutUser } from "lib/appwrite/auth";
 import { cn } from "lib/utils";
 import { LuLogOut } from "react-icons/lu";
-import { Link, NavLink } from "react-router";
+import { Link, NavLink, useLoaderData, useNavigate } from "react-router";
 import { sidebarItems } from "~/constants";
 
 interface NavItemsProps {
@@ -8,10 +9,12 @@ interface NavItemsProps {
 }
 
 const NavItems = ({ onClosesidebar }: NavItemsProps) => {
-  const user = {
-    name: "Amir mohammad",
-    email: "amirhamzavi44@gmail.com",
-    avatar: "/assets/images/Amir profile 1.jpeg",
+  const navigate = useNavigate();
+  const user = useLoaderData();
+
+  const handleLogOut = async () => {
+    await logoutUser();
+    navigate("/sign-in");
   };
 
   return (
@@ -49,16 +52,17 @@ const NavItems = ({ onClosesidebar }: NavItemsProps) => {
       {/* footer بیرون از اسکرول */}
       <footer className="nav-footer   ">
         <img
+          referrerPolicy="no-referrer"
           className="object-cover size-10"
-          src={user.avatar}
-          alt={user.name}
+          src={user?.imageUrl}
+          alt={user?.name}
         />
         <article>
-          <h2>{user.name}</h2>
-          <p>{user.email}</p>
+          <h2>{user?.name}</h2>
+          <p>{user?.email}</p>
         </article>
 
-        <button onClick={() => {}} className="cursor-pointer">
+        <button onClick={handleLogOut} className="cursor-pointer">
           <LuLogOut className="text-red-500" size={24} />
         </button>
       </footer>

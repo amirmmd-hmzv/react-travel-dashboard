@@ -11,7 +11,6 @@ const TripCard = ({
   price,
   tags,
 }: TripCardProps) => {
-  console.log(tags);
   const path = useLocation();
   return (
     <Link
@@ -25,14 +24,14 @@ const TripCard = ({
       <img src={imageUrl} alt={name} />
 
       <article>
-        <h2 className="text-primary-100">{name}</h2>
+        <h2 className="text-dark-100">{name}</h2>
         <figure>
           <LuMap className="text-gray-100" />
           <figcaption>{location}</figcaption>
         </figure>
       </article>
 
-      <div className="mt-4 pt-3.5 pl-3.5 pb-4 flex gap-1.5 border-b border-primary-100">
+      <div className="mt-4 pt-3.5 pl-3.5 pb-4 flex gap-1.5 border-b border-light-300">
         {tags.map((tag, index) => (
           <Chip
             key={`tag-${index}`}
@@ -44,7 +43,7 @@ const TripCard = ({
         ))}
       </div>
 
-      <div className="mt-4  pl-3.5 pb-4  font-semibold font-clash-display tracking-wider text-dark-100 text-sm  lg:text-lg ">From &nbsp;{price}</div>
+      <div className="mt-4  pl-3.5 pb-4  font-semibold font-clash-display tracking-wider text-primary-100 text-sm  lg:text-base ">From &nbsp;{price}</div>
     </Link>
   );
 };

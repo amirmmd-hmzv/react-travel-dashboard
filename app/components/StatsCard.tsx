@@ -12,7 +12,6 @@ const StatsCard = ({
     return calculateTrendPercentage(currentMonthCount, lastMonthCount);
   }, [currentMonthCount, lastMonthCount]);
 
-  console.log(trend);
   const isIncrement = trend == "increment";
 
   return (

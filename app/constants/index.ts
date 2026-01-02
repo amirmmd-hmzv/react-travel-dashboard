@@ -203,7 +203,22 @@ export const dashboardStats = {
   userRole: { total: 89, currentMonth: 89, lastMonth: 700 },
 };
 
-export const users = [
+
+// types/user.ts
+export type User = {
+  id: number;
+  name: string;
+  email: string;
+  dateJoined: string;
+  imageUrl: string;
+  itineraryCreated: number;
+  status: 'admin' | 'user';
+};
+
+
+
+
+export const users : User[] = [
   {
     id: 1,
     name: "John Doe",
@@ -224,8 +239,8 @@ export const users = [
   },
   {
     id: 3,
-    name: "John Smith",
-    email: "john.smith@example.com",
+    name: "Amir mohammad Hamzavi",
+    email: "amirhamzavijob@gmail.com",
     imageUrl: "/assets/images/david.webp",
     dateJoined: formatDate("2025-01-03"),
     itineraryCreated: 8,
