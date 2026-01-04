@@ -10,7 +10,9 @@ export default [
   layout("routes/admin/admin-layout.tsx", [
     route("dashboard", "routes/admin/dashboard.tsx"),
     route("all-users", "routes/admin/all-users.tsx"),
+    route("trips", "routes/admin/trips.tsx"),
+    route("trips/create", "routes/admin/create-trip.tsx"),
   ]),
   route("/sentry-example-page", "routes/sentry-example-page.tsx"),
-  route("/api/sentry-example-api", "routes/api.sentry-example-api.ts")
+  route("/api/sentry-example-api", "routes/api.sentry-example-api.ts"),
 ] satisfies RouteConfig;

@@ -403,7 +403,7 @@
   }
 
   .status-column {
-    @apply flex justify-center items-center gap-1 w-[65px] py-[2px]  rounded-2xl mix-blend-multiply;
+    @apply flex justify-center items-center gap-1 w-16.25 py-0.5  rounded-2xl mix-blend-multiply;
   }
 
   .dashboard {

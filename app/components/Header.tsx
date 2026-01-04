@@ -1,12 +1,16 @@
 import { cn } from "lib/utils";
-import { useLocation } from "react-router";
+import { Link, useLocation } from "react-router";
+import { Button } from "./ui/button";
 
 interface HeaderProps {
   title: string;
   description: string;
+  ctaText?: string;
+  ctaUrl?: string;
+  icon?: React.ReactNode;
 }
 
-const Header = ({ title, description }: HeaderProps) => {
+const Header = ({ title, description, ctaText, ctaUrl, icon }: HeaderProps) => {
   const location = useLocation();
   return (
     <header className="header">
@@ -32,6 +36,19 @@ const Header = ({ title, description }: HeaderProps) => {
           {description}
         </p>
       </article>
+
+      {ctaText && ctaUrl && (
+        <Link to={ctaUrl}>
+          <Button
+            size={"lg"}
+            className="text-sm lg:text-base font-semibold p-6 px-4 w-full lg:w-fit tracking-wide"
+            variant={"outline"}
+          >
+            {ctaText}
+            {icon}
+          </Button>
+        </Link>
+      )}
     </header>
   );
 };
