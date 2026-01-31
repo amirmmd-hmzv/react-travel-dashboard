@@ -9,6 +9,7 @@ import { Button } from "~/components/ui/button";
 import { LuLoader, LuSparkle } from "react-icons/lu";
 import { HiSparkles } from "react-icons/hi";
 import { account } from "lib/appwrite/client";
+import { useNavigate } from "react-router";
 
 export interface CountryOption {
   value: string;
@@ -49,6 +50,7 @@ export interface CountryOption {
 const CreateTrip = ({ loaderData }: Route.ComponentProps) => {
   const [countries, setCountries] = useState<Country[]>([]);
   const [loadingCountries, setLoadingCountries] = useState(true);
+  const navigate = useNavigate();
 
   const [formData, setFormData] = useState<TripFormData>({
     country: countries[0]?.value || "",
@@ -138,9 +140,9 @@ const CreateTrip = ({ loaderData }: Route.ComponentProps) => {
     }
 
     try {
-      const response = await fetch(`/api/create-trip`, {
+      const response = await fetch("/api/create-trip", {
         method: "POST",
-        headers: { "Content-type ": "application/json" },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           country: formData.country,
           numberOfDays: formData.duration,
@@ -152,8 +154,10 @@ const CreateTrip = ({ loaderData }: Route.ComponentProps) => {
         }),
       });
 
-      // console.log(user);
-      // console.log(formData);
+      const result: CreateTripResponse = await response.json();
+
+      if (result?.id) navigate(`/trips/${result.id}`);
+      else console.error("Failed to generate a trip");
       setError(null);
     } catch (error) {
       console.log("Error creating trip:", error);
