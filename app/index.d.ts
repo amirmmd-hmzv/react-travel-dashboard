@@ -18,6 +18,8 @@ declare interface Country {
   coordinates: [number, number];
   value: string;
   openStreetMap?: string;
+  flag: string;
+  cca3: string;
 }
 
 declare interface DropdownItem {
@@ -152,6 +154,7 @@ declare interface TripFormData {
   country: string;
   travelStyle: string;
   interest: string;
+  cca3Country: string;
   budget: string;
   duration: number;
   groupType: string;
