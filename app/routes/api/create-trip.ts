@@ -16,7 +16,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
   console.log(userId, country);
 
-  const genAI = new GoogleGenerativeAI(process.env.VITE_GOOGLE_AI_API_KEY!);
+  const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY!);
   const unsplashApiKey = process.env.UNSPLASH_ACCESS_KEY!;
 
   try {
@@ -68,13 +68,13 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     }`;
 
     const textResult = await genAI
-      .getGenerativeModel({ model: "gemini-2.0-flash" })
+      .getGenerativeModel({ model: "gemini-1.5-flash" })
       .generateContent([prompt]);
 
     const trip = parseMarkdownToJson(textResult.response.text());
 
     const imageResponse = await fetch(
-      `https://api.unspalsh.com/search/photos?query=${country} ${interests} ${travelStyle}&client_id=${unsplashApiKey}`,
+      `https://api.unsplash.com/search/photos?query=${country} ${interests} ${travelStyle}&client_id=${unsplashApiKey}`,
     );
 
     const imageUrls = (await imageResponse.json()).results
