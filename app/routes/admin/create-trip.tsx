@@ -109,6 +109,7 @@ const CreateTrip = ({ loaderData }: Route.ComponentProps) => {
           ?.coordinates || [],
     },
   ];
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
