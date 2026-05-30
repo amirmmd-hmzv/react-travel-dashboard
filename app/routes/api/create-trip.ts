@@ -68,9 +68,9 @@ export const action = async ({ request }: ActionFunctionArgs) => {
         ]
     }`;
 
-    const textResult = await genAI
-      .getGenerativeModel({ model: "gemini-2.0-flash" })
-      .generateContent([prompt]);
+  const textResult = await genAI
+  .getGenerativeModel({ model: "gemini-2.5-flash" })
+  .generateContent([prompt]);
 
     const trip = parseMarkdownToJson(textResult.response.text());
 
@@ -87,8 +87,8 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       appwriteConfig.tripsCollections,
       ID.unique(),
       {
-        tripDetails: JSON.stringify(trip),
-        createdAt: new Date().toISOString(),
+        tripDetail: JSON.stringify(trip),
+        // createdAt: new Date().toISOString(),
         imageUrls,
         userId,
       },
