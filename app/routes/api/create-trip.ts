@@ -35,7 +35,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
         "budget": "${budget}",
         "travelStyle": "${travelStyle}",
         "country": "${country}",
-        "interests": ${interests},
+        "interests": "${interests}",
         "groupType": "${groupType}",
         "bestTimeToVisit": [
           '🌸 Season (from month to month): reason to visit',

@@ -13,6 +13,7 @@ export default [
     route("all-users", "routes/admin/all-users.tsx"),
     route("trips", "routes/admin/trips.tsx"),
     route("trips/create", "routes/admin/create-trip.tsx"),
+    route("trips/:tripId", "routes/admin/trip-details.tsx"),
   ]),
   route("/sentry-example-page", "routes/sentry-example-page.tsx"),
   route("/api/sentry-example-api", "routes/api.sentry-example-api.ts"),

@@ -5,7 +5,7 @@ import { LuX } from "react-icons/lu";
 
 type ChipSize = "sm" | "md" | "lg";
 type ChipColor = "primary" | "pink";
-type ChipVariant = "default" | "solid" | "outline";
+type ChipVariant = "default" | "solid" | "outline" | "custom";
 
 interface ChipProps {
   children: React.ReactNode;
@@ -47,6 +47,7 @@ const Chip = ({
       primary: "bg-primary-50 text-primary-500 border-primary-100 ",
       pink: "bg-pink-50 text-pink-500 border-pink-100 ",
     },
+    custom: "",
   };
 
   const sizes: Record<ChipSize, string> = {

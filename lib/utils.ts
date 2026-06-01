@@ -11,18 +11,31 @@ export const formatDate = (dateString: string): string => {
 };
 
 export function parseMarkdownToJson(markdownText: string): unknown | null {
-  const regex = /```json\n([\s\S]+?)\n```/;
-  const match = markdownText.match(regex);
+  const trimmed = markdownText.trim();
 
-  if (match && match[1]) {
+  // Try extracting from markdown fences (```json ... ``` or ``` ... ```)
+  const fenceRegex = /```(?:json)?\s*\n?([\s\S]+?)\n?```/;
+  const fenceMatch = trimmed.match(fenceRegex);
+  if (fenceMatch && fenceMatch[1]) {
     try {
-      return JSON.parse(match[1]);
-    } catch (error) {
-      console.error("Error parsing JSON:", error);
-      return null;
-    }
+      return JSON.parse(fenceMatch[1].trim());
+    } catch {}
   }
-  console.error("No valid JSON found in markdown text.");
+
+  // Fallback: try parsing the whole response as raw JSON
+  try {
+    return JSON.parse(trimmed);
+  } catch {}
+
+  // Try finding JSON object in the text (starts with {)
+  const jsonStart = trimmed.indexOf("{");
+  if (jsonStart !== -1) {
+    try {
+      return JSON.parse(trimmed.slice(jsonStart));
+    } catch {}
+  }
+
+  console.error("No valid JSON found in response.");
   return null;
 }
 

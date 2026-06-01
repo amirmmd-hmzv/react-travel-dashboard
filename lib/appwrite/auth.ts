@@ -1,5 +1,5 @@
-import { ID, OAuthProvider, Query } from "appwrite";
-import { account, db, appwriteConfig } from "../appwrite/client";
+import { ID, Query } from "appwrite";
+import { OAuthProvider, account, db, appwriteConfig } from "../appwrite/client";
 import { redirect } from "react-router";
 
 export const getExistingUser = async (id: string) => {
@@ -7,7 +7,7 @@ export const getExistingUser = async (id: string) => {
     const { documents, total } = await db.listDocuments(
       appwriteConfig.databaseId,
       appwriteConfig.usersCollections,
-      [Query.equal("accountId", id)]
+      [Query.equal("accountId", id)],
     );
     return total > 0 ? documents[0] : null;
   } catch (error) {
@@ -36,12 +36,14 @@ export const storeUserData = async () => {
         name: user.name,
         imageUrl: profilePicture,
         joinedAt: new Date().toISOString(),
-      }
+      },
     );
 
-    if (!createdUser.$id) redirect("/sign-in");
+    if (!createdUser.$id) return redirect("/sign-in");
+    return createdUser;
   } catch (error) {
     console.error("Error storing user data:", error);
+    return redirect("/sign-in");
   }
 };
 
@@ -49,7 +51,7 @@ const getGooglePicture = async (accessToken: string) => {
   try {
     const response = await fetch(
       "https://people.googleapis.com/v1/people/me?personFields=photos",
-      { headers: { Authorization: `Bearer ${accessToken}` } }
+      { headers: { Authorization: `Bearer ${accessToken}` } },
     );
     if (!response.ok) throw new Error("Failed to fetch Google profile picture");
 
@@ -63,10 +65,10 @@ const getGooglePicture = async (accessToken: string) => {
 
 export const loginWithGoogle = async () => {
   try {
-    account.createOAuth2Session(
+     account.createOAuth2Session(
       OAuthProvider.Google,
       `${window.location.origin}/`,
-      `${window.location.origin}/404`
+      `${window.location.origin}/404`,
     );
   } catch (error) {
     console.error("Error during OAuth2 session creation:", error);
@@ -92,7 +94,7 @@ export const getUser = async () => {
       [
         Query.equal("accountId", user.$id),
         Query.select(["name", "email", "imageUrl", "joinedAt", "accountId"]),
-      ]
+      ],
     );
 
     return documents.length > 0 ? documents[0] : redirect("/sign-in");
@@ -107,14 +109,14 @@ export const getAllUsers = async (limit: number, offset: number) => {
     const { documents: users, total } = await db.listDocuments(
       appwriteConfig.databaseId,
       appwriteConfig.usersCollections,
-      [Query.limit(limit), Query.offset(offset)]
+      [Query.limit(limit), Query.offset(offset)],
     );
 
     if (total === 0) return { users: [], total };
 
     return { users, total };
   } catch (e) {
-    console.log("Error fetching users",e);
+    console.log("Error fetching users", e);
     return { users: [], total: 0 };
   }
 };
