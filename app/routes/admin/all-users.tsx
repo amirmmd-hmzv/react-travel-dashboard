@@ -1,11 +1,11 @@
-import { getAllUsers } from "lib/appwrite/auth";
+import { getAllUsers, getAllUsersWithTripCount } from "lib/appwrite/auth";
 import { cn, formatDate } from "lib/utils";
 import { Header } from "~/components";
 import { CustomTable } from "~/components/CustomTable";
 import type { Route } from "./+types/all-users";
 
 export async function loader() {
-  const { total, users } = await getAllUsers(10, 0);
+  const { total, users } = await getAllUsersWithTripCount(10, 0);
   return { total, users };
 
 }
@@ -61,7 +61,7 @@ const AllUsers = ({ loaderData }: Route.ComponentProps) => {
             },
           },
           {
-            key: "itineraryCreated",
+            key: "tripCount",
             header: " Created Trips",
             align: "center",
           },

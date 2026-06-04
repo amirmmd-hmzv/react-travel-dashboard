@@ -37,6 +37,7 @@ const TripDetails = ({ loaderData }: Route.ComponentProps) => {
 
   const imageUrls = loaderData?.trip?.imageUrls || [];
 
+
   const {
     name,
     duration,
