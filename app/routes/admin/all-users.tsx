@@ -2,12 +2,12 @@ import { getAllUsers } from "lib/appwrite/auth";
 import { cn, formatDate } from "lib/utils";
 import { Header } from "~/components";
 import { CustomTable } from "~/components/CustomTable";
-import { users } from "~/constants";
-import type { Route } from "./+types/dashboard";
+import type { Route } from "./+types/all-users";
 
 export async function loader() {
   const { total, users } = await getAllUsers(10, 0);
   return { total, users };
+
 }
 
 const AllUsers = ({ loaderData }: Route.ComponentProps) => {

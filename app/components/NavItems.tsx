@@ -1,20 +1,20 @@
-import { logoutUser } from "lib/appwrite/auth";
 import { cn } from "lib/utils";
 import { LuLogOut } from "react-icons/lu";
-import { Link, NavLink, useLoaderData, useNavigate } from "react-router";
+import { Link, NavLink, useLoaderData } from "react-router";
 import { sidebarItems } from "~/constants";
+import { useState } from "react";
+import LogoutConfirmDialog from "./LogoutConfirmDialog";
 
 interface NavItemsProps {
   onClosesidebar?: () => void;
 }
 
 const NavItems = ({ onClosesidebar }: NavItemsProps) => {
-  const navigate = useNavigate();
   const user = useLoaderData();
+  const [isLogoutDialogOpen, setIsLogoutDialogOpen] = useState(false);
 
-  const handleLogOut = async () => {
-    await logoutUser();
-    navigate("/sign-in");
+  const handleLogoutClick = () => {
+    setIsLogoutDialogOpen(true);
   };
 
   return (
@@ -62,10 +62,19 @@ const NavItems = ({ onClosesidebar }: NavItemsProps) => {
           <p>{user?.email}</p>
         </article>
 
-        <button onClick={handleLogOut} className="cursor-pointer">
+        <button
+          onClick={handleLogoutClick}
+          className="cursor-pointer hover:opacity-80 transition"
+        >
           <LuLogOut className="text-red-500" size={24} />
         </button>
       </footer>
+
+      {/* Logout Confirmation Modal */}
+      <LogoutConfirmDialog
+        open={isLogoutDialogOpen}
+        onOpenChange={setIsLogoutDialogOpen}
+      />
     </section>
   );
 };

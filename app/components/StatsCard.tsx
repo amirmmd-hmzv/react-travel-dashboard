@@ -1,6 +1,7 @@
 import { calculateTrendPercentage, cn } from "lib/utils";
 import { useMemo } from "react";
 import { LuArrowDown, LuArrowUp } from "react-icons/lu";
+import MiniChart from "./MiniChart";
 
 const StatsCard = ({
   headTitle,
@@ -13,6 +14,19 @@ const StatsCard = ({
   }, [currentMonthCount, lastMonthCount]);
 
   const isIncrement = trend == "increment";
+
+  // Generate chart data - simulating trend with smooth values
+  const chartData = useMemo(() => {
+    const dataPoints = 12; // 12 data points for the mini chart
+    const startValue = Math.max(lastMonthCount - 20, 0);
+    const endValue = currentMonthCount;
+
+    return Array.from({ length: dataPoints }, (_, i) => ({
+      value: Math.round(
+        startValue + ((endValue - startValue) * i) / (dataPoints - 1),
+      ),
+    }));
+  }, [currentMonthCount, lastMonthCount]);
 
   return (
     <article className="stats-card  border-pink-10 shadow-pink-5">
@@ -32,7 +46,7 @@ const StatsCard = ({
               <figcaption
                 className={cn(
                   "text-base",
-                  isIncrement ? "text-navy-500" : "text-pink-500"
+                  isIncrement ? "text-navy-500" : "text-pink-500",
                 )}
               >
                 {Math.round(percentage)}%
@@ -43,8 +57,9 @@ const StatsCard = ({
             </figure>
           </div>
         </div>
-        <img src={`/assets/icons/${trend}.svg`} alt="" />
-        {/* must chnage with chart js */}
+
+        {/* Real Chart Component */}
+        <MiniChart trend={trend} data={chartData} />
       </div>
     </article>
   );

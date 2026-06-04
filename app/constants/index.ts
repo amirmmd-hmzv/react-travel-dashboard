@@ -152,10 +152,6 @@ export const RIGHT_CONFETTI = {
   origin: { x: 1, y: 1 },
 };
 
-export const user = {
-  name: " Amir",
-};
-
 export const allTrips = [
   {
     id: 1,

@@ -40,3 +40,25 @@ export const getTripById = async (tripId: string) => {
     return null;
   }
 };
+
+/**
+ * Get count of trips created by a specific user
+ * @param userId - The user's account ID
+ * @returns Number of trips created by the user
+ */
+export const getTripCountByUser = async (userId: string): Promise<number> => {
+  try {
+    if (!userId) return 0;
+
+    const { total } = await db.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.tripsCollections,
+      [Query.equal("userId", userId)],
+    );
+
+    return total || 0;
+  } catch (error) {
+    console.error(`Error fetching trip count for user ${userId}:`, error);
+    return 0;
+  }
+};

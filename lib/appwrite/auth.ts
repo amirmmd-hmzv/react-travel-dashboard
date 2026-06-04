@@ -21,6 +21,10 @@ export const storeUserData = async () => {
     const user = await account.get();
     if (!user) throw new Error("User not found");
 
+    // ✅ Check if user already exists before creating
+    const existingUser = await getExistingUser(user.$id);
+    if (existingUser) return existingUser;
+
     const { providerAccessToken } = (await account.getSession("current")) || {};
     const profilePicture = providerAccessToken
       ? await getGooglePicture(providerAccessToken)
@@ -65,7 +69,7 @@ const getGooglePicture = async (accessToken: string) => {
 
 export const loginWithGoogle = async () => {
   try {
-     account.createOAuth2Session(
+    account.createOAuth2Session(
       OAuthProvider.Google,
       `${window.location.origin}/`,
       `${window.location.origin}/404`,
@@ -119,4 +123,92 @@ export const getAllUsers = async (limit: number, offset: number) => {
     console.log("Error fetching users", e);
     return { users: [], total: 0 };
   }
+};
+
+/**
+ * Get users with their trip count in a single operation (best practice)
+ * Fetches all user data and counts trips for each user in one batch operation
+ * @param limit - Number of users to fetch
+ * @param offset - Number of users to skip
+ * @returns Array of users with trip counts and total count
+ */
+export const getAllUsersWithTripCount = async (
+  limit: number,
+  offset: number,
+) => {
+  try {
+    const { db: database } = await import("./client");
+    const { documents: users, total } = await db.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.usersCollections,
+      [Query.limit(limit), Query.offset(offset)],
+    );
+
+    if (total === 0) return { users: [], total };
+
+    // Get trip counts for all users in a single batch query
+    const usersWithCounts = await Promise.all(
+      users.map(async (user) => {
+        try {
+          const { total: tripCount } = await db.listDocuments(
+            appwriteConfig.databaseId,
+            appwriteConfig.tripsCollections,
+            [Query.equal("userId", user.accountId)],
+          );
+
+          return {
+            ...user,
+            tripCount: tripCount || 0,
+          };
+        } catch (error) {
+          console.error(
+            `Error fetching trip count for user ${user.accountId}:`,
+            error,
+          );
+          return {
+            ...user,
+            tripCount: 0,
+          };
+        }
+      }),
+    );
+
+    return { users: usersWithCounts, total };
+  } catch (e) {
+    console.log("Error fetching users with trip count", e);
+    return { users: [], total: 0 };
+  }
+};
+export const cleanupDuplicateUsers = async () => {
+  const { documents } = await db.listDocuments(
+    appwriteConfig.databaseId,
+    appwriteConfig.usersCollections,
+    [Query.limit(100)],
+  );
+
+  // Group by accountId
+  const grouped: Record<string, typeof documents> = {};
+  for (const doc of documents) {
+    const id = doc.accountId;
+    if (!grouped[id]) grouped[id] = [];
+    grouped[id].push(doc);
+  }
+
+  // Delete duplicates, keep the first one
+  for (const [accountId, docs] of Object.entries(grouped)) {
+    if (docs.length > 1) {
+      console.log(`Found ${docs.length} duplicates for ${accountId}`);
+      const [keep, ...duplicates] = docs;
+      for (const doc of duplicates) {
+        await db.deleteDocument(
+          appwriteConfig.databaseId,
+          appwriteConfig.usersCollections,
+          doc.$id,
+        );
+        console.log("Deleted:", doc.$id);
+      }
+    }
+  }
+
+  console.log("Cleanup done!");
 };
