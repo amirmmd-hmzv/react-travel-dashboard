@@ -40,14 +40,16 @@ const LandingHero = () => {
                 Browse Trips
               </Button>
             </Link>
-            <Link to="/admin/dashboard">
-              <Button
-                variant="outline"
-                className="bg-white/10 backdrop-blur border-white/30 text-white hover:bg-white/20 font-plus-jakarta font-semibold px-8 py-3 rounded-lg text-base transition-all"
-              >
-                My Dashboard
-              </Button>
-            </Link>
+            {currentUser?.status === "admin" && (
+              <Link to="/admin/dashboard">
+                <Button
+                  variant="outline"
+                  className="bg-white/10 backdrop-blur border-white/30 text-white hover:bg-white/20 font-plus-jakarta font-semibold px-8 py-3 rounded-lg text-base transition-all"
+                >
+                  My Dashboard
+                </Button>
+              </Link>
+            )}
           </div>
 
           <div className="flex flex-wrap justify-center gap-8 mt-6 pt-8 border-t border-white/20 w-full max-w-2xl">

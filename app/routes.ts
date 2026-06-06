@@ -19,6 +19,7 @@ export default [
     index("routes/root/travel-page.tsx"),
     route("trips", "routes/root/trips-page.tsx"),
     route("travel/:tripId", "routes/root/travel-trip-details.tsx"),
+    route("*", "routes/root/not-found.tsx"),
   ]),
   route("/sentry-example-page", "routes/sentry-example-page.tsx"),
   route("/api/sentry-example-api", "routes/api.sentry-example-api.ts"),

@@ -7,11 +7,13 @@ function PageShell() {
   const currentUser = useUser();
 
   return (
-    <div className="min-h-screen bg-light-200">
+    <>
       <SiteHeader currentUser={currentUser} />
-      <Outlet />
+      <div className="flex-1">
+        <Outlet />
+      </div>
       <SiteFooter />
-    </div>
+    </>
   );
 }
 
