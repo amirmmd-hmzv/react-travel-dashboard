@@ -15,7 +15,10 @@ export default [
     route("trips/create", "routes/admin/create-trip.tsx"),
     route("trips/:tripId", "routes/admin/trip-details.tsx"),
   ]),
-  layout("routes/root/page-layout.tsx", [index("routes/root/travel-page.tsx")]),
+  layout("routes/root/page-layout.tsx", [
+    index("routes/root/travel-page.tsx"),
+    route("travel/:tripId", "routes/root/travel-trip-details.tsx"),
+  ]),
   route("/sentry-example-page", "routes/sentry-example-page.tsx"),
   route("/api/sentry-example-api", "routes/api.sentry-example-api.ts"),
 ] satisfies RouteConfig;

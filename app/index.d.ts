@@ -74,6 +74,7 @@ declare interface Trip {
   weatherInfo: string[];
   location: Location;
   payment_link: string;
+  rating?: number;
 }
 
 declare interface TripCardProps {
@@ -128,8 +129,14 @@ declare interface DestinationProps {
   title: string;
 }
 
+declare interface AppwriteTripDocument {
+  $id: string;
+  tripDetail: string;
+  imageUrls?: string[];
+}
+
 type GetAllTripsResponse = {
-  allTrips: Models.Document[];
+  allTrips: AppwriteTripDocument[];
   total: number;
 };
 

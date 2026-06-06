@@ -40,6 +40,7 @@ export const storeUserData = async () => {
         name: user.name,
         imageUrl: profilePicture,
         joinedAt: new Date().toISOString(),
+        status: "user",
       },
     );
 

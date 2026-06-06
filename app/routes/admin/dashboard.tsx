@@ -6,8 +6,7 @@ import {
   getUserGrowthPerDay,
   getUsersAndTripsStats,
 } from "lib/appwrite/dashboard";
-import { getAllTrips } from "lib/appwrite/trips";
-import { parseTripData } from "lib/utils";
+import { getAllTrips, mapAppwriteTrips } from "lib/appwrite/trips";
 
 import {
   Table,
@@ -70,13 +69,7 @@ export async function clientLoader() {
     getAllUsersWithTripCount(4, 0), 
   ]);
 
-  const allTrips = trips.allTrips.map(
-    ({ $id, tripDetail, imageUrls }: any) => ({
-      id: $id,
-      ...parseTripData(tripDetail),
-      imageUrls: imageUrls ?? [],
-    }),
-  );
+  const allTrips = mapAppwriteTrips(trips.allTrips);
 
   // ✅ Map users - trip count is already included from getAllUsersWithTripCount
   const mappedUsers: UsersItineraryCount[] =

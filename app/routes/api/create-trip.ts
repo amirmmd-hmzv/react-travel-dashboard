@@ -30,6 +30,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
         {
         "name": "A descriptive title for the trip",
         "description": "A brief description of the trip and its highlights not exceeding 100 words",
+        "rating": "Overall rating from 1.0 to 5.0 based on the trip quality, e.g. 4.7",
         "estimatedPrice": "Lowest average price for the trip in USD, e.g.$price",
         "duration": ${numberOfDays},
         "budget": "${budget}",
@@ -116,5 +117,9 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     return data({ id: result.$id });
   } catch (e) {
     console.error("Error generating travel plan: ", e);
+    return data(
+      { error: "Failed to generate travel plan. Please try again." },
+      { status: 500 },
+    );
   }
 };

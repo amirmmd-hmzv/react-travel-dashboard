@@ -1,10 +1,9 @@
-import { getAllTrips } from "lib/appwrite/trips";
-import { parseTripData } from "lib/utils";
+import { getAllTrips, mapAppwriteTrips } from "lib/appwrite/trips";
 import { LuPlus } from "react-icons/lu";
-import { useSearchParams, type LoaderFunctionArgs } from "react-router";
+import { type LoaderFunctionArgs } from "react-router";
 import { Header, TripCard } from "~/components";
 import AppPagination from "~/components/AppPagination";
-import type { Route } from "./+types/dashboard";
+import type { Route } from "./+types/trips";
 
 const LIMIT = 8;
 
@@ -16,11 +15,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   const { allTrips, total } = await getAllTrips(LIMIT, offset);
 
   return {
-    trips: allTrips.map(({ $id, tripDetail, imageUrls }) => ({
-      id: $id,
-      ...parseTripData(tripDetail),
-      imageUrls: imageUrls ?? [],
-    })),
+    trips: mapAppwriteTrips(allTrips),
     total,
     currentPage: page,
   };

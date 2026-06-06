@@ -6,18 +6,14 @@ import { MobileSidebar, NavItems } from "~/components";
 export async function clientLoader() {
   try {
     const user = await account.get();
-    console.log(user)
 
     if (!user?.$id) return redirect("/sign-in");
 
+    const existingUser = await getExistingUser(user.$id);
 
-    const existingUser = await getExistingUser(user?.$id);
-
-
-    if (existingUser?.status == "user") {
-      return redirect("/sign-in");
+    if (existingUser?.status === "user") {
+      return redirect("/");
     }
-
 
     return existingUser?.$id ? existingUser : await storeUserData();
    

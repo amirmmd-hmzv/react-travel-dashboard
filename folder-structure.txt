@@ -1,0 +1,136 @@
+﻿react-travel-dashboard/
+├── .dockerignore
+├── .env.local
+├── .env.sentry-build-plugin
+├── .gitignore
+├── components.json
+├── Dockerfile
+├── instrument.server.mjs
+├── package.json
+├── package-lock.json
+├── react-router.config.ts
+├── README.md
+├── tsconfig.json
+├── vite.config.ts
+├── .react-router/
+│   └── types/
+│       ├── +future.ts
+│       ├── +routes.ts
+│       ├── +server-build.d.ts
+│       └── app/
+│           ├── +types/root.ts
+│           └── routes/+types/
+│               ├── api.sentry-example-api.ts
+│               └── sentry-example-page.ts
+├── .vscode/
+│   └── mcp.json
+├── app/
+│   ├── app.css
+│   ├── entry.client.tsx
+│   ├── entry.server.tsx
+│   ├── index.d.ts
+│   ├── root.tsx
+│   ├── routes.ts
+│   ├── components/
+│   │   ├── index.ts
+│   │   ├── AppPagination.tsx
+│   │   ├── CustomTable.tsx
+│   │   ├── Header.tsx
+│   │   ├── InfoPill.tsx
+│   │   ├── LogoutConfirmDialog.tsx
+│   │   ├── MiniChart.tsx
+│   │   ├── MobileSidebar.tsx
+│   │   ├── NavItems.tsx
+│   │   ├── StarRating.tsx
+│   │   ├── StatsCard.tsx
+│   │   ├── TripCard.tsx
+│   │   ├── TripDetailsBody.tsx
+│   │   ├── WorldMap.tsx
+│   │   └── ui/
+│   │       ├── button.tsx
+│   │       ├── card.tsx
+│   │       ├── chart.tsx
+│   │       ├── Cheap.tsx
+│   │       ├── combobox.tsx
+│   │       ├── command.tsx
+│   │       ├── dialog.tsx
+│   │       ├── pagination.tsx
+│   │       ├── popover.tsx
+│   │       └── table.tsx
+│   ├── constants/
+│   │   ├── index.ts
+│   │   └── world_map.ts
+│   └── routes/
+│       ├── api.sentry-example-api.ts
+│       ├── home.tsx
+│       ├── sentry-example-page.tsx
+│       ├── admin/
+│       │   ├── admin-layout.tsx
+│       │   ├── all-users.tsx
+│       │   ├── create-trip.tsx
+│       │   ├── dashboard.tsx
+│       │   ├── trip-details.tsx
+│       │   └── trips.tsx
+│       ├── api/
+│       │   └── create-trip.ts
+│       └── root/
+│           ├── page-layout.tsx
+│           ├── sign-in.tsx
+│           ├── travel-page.tsx
+│           └── travel-trip-details.tsx
+├── lib/
+│   ├── utils.ts
+│   └── appwrite/
+│       ├── auth.ts
+│       ├── client.ts
+│       ├── dashboard.ts
+│       └── trips.ts
+└── public/
+    └── assets/
+        ├── icons/
+        │   ├── arrow-down.svg
+        │   ├── arrow-down-red.svg
+        │   ├── arrow-left.svg
+        │   ├── arrow-up-green.svg
+        │   ├── blue-check.svg
+        │   ├── calendar.svg
+        │   ├── check.svg
+        │   ├── decrement.svg
+        │   ├── destination.svg
+        │   ├── filter.svg
+        │   ├── google.svg
+        │   ├── home.svg
+        │   ├── increment.svg
+        │   ├── itinerary.svg
+        │   ├── itinerary-button.svg
+        │   ├── loader.svg
+        │   ├── location-mark.svg
+        │   ├── logo.svg
+        │   ├── logout.svg
+        │   ├── magic-star.svg
+        │   ├── menu.svg
+        │   ├── plus.svg
+        │   ├── refresh.svg
+        │   ├── star.svg
+        │   ├── star-empty.svg
+        │   └── users.svg
+        └── images/
+            ├── Amir profile 1.jpeg
+            ├── auth-img.webp
+            ├── card-img-1.png
+            ├── card-img-2.png
+            ├── card-img-3.png
+            ├── card-img-4.png
+            ├── card-img-5.png
+            ├── card-img-6.png
+            ├── content.png
+            ├── david.webp
+            ├── hero-img.png
+            ├── james.webp
+            ├── michael.webp
+            ├── readme.png
+            ├── sample.jpeg
+            ├── sample1.jpg
+            ├── sample2.jpg
+            ├── sample3.jpg
+            └── sample4.jpg

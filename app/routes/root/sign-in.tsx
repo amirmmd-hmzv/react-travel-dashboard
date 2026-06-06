@@ -1,16 +1,14 @@
-import { loginWithGoogle, logoutUser } from "lib/appwrite/auth";
+import { loginWithGoogle } from "lib/appwrite/auth";
 import { account } from "lib/appwrite/client";
 import { FaGoogle } from "react-icons/fa";
-import { Link, redirect, useNavigate } from "react-router";
+import { Link, redirect } from "react-router";
 
 export async function clientLoader() {
-    
   try {
     const user = await account.get();
-    console.log(user)
     if (user.$id) return redirect("/");
-  } catch (e) {
-    console.log("Error fetching user", e);
+  } catch {
+    // Not signed in — show sign-in page
   }
 }
 

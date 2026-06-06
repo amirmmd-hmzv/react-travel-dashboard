@@ -1,5 +1,28 @@
 import { Query } from "appwrite";
+import { parseTripData } from "lib/utils";
 import { appwriteConfig, db } from "./client";
+
+export type AppwriteTripDocument = {
+  $id: string;
+  tripDetail: string;
+  imageUrls?: string[];
+};
+
+export const mapAppwriteTrip = (doc: AppwriteTripDocument): Trip | null => {
+  const parsed = parseTripData(doc.tripDetail);
+  if (!parsed) return null;
+
+  const { id: _id, imageUrls: _imageUrls, ...tripFields } = parsed;
+
+  return {
+    ...tripFields,
+    id: doc.$id,
+    imageUrls: doc.imageUrls ?? [],
+  };
+};
+
+export const mapAppwriteTrips = (docs: AppwriteTripDocument[]): Trip[] =>
+  docs.map(mapAppwriteTrip).filter((trip): trip is Trip => trip !== null);
 
 export const getAllTrips = async (limit: number, offset: number) => {
   try {
@@ -14,7 +37,7 @@ export const getAllTrips = async (limit: number, offset: number) => {
       return { allTrips: [], total: 0 };
     }
 
-    return { allTrips: trips, total };
+    return { allTrips: trips as unknown as AppwriteTripDocument[], total };
   } catch (error) {
     console.error("Error fetching all trips:", error);
     return { allTrips: [], total: 0 };

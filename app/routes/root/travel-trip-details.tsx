@@ -1,14 +1,15 @@
 import { getAllTrips, getTripById, mapAppwriteTrips } from "lib/appwrite/trips";
 import { parseTripData } from "lib/utils";
-import { Header, TripCard } from "~/components";
+import { Link } from "react-router";
+import { TripCard } from "~/components";
 import TripDetailsBody from "~/components/TripDetailsBody";
-import type { Route } from "./+types/trip-details";
+import type { Route } from "./+types/travel-trip-details";
 
 export const loader = async ({ params }: { params: { tripId: string } }) => {
   const { tripId } = params;
 
   if (!tripId) {
-    throw new Response("Trip ID is required", { status: 400 });
+    throw new Response("Trip not found", { status: 404 });
   }
 
   const [trip, trips] = await Promise.all([
@@ -16,35 +17,35 @@ export const loader = async ({ params }: { params: { tripId: string } }) => {
     getAllTrips(4, 0),
   ]);
 
+  if (!trip) {
+    throw new Response("Trip not found", { status: 404 });
+  }
+
   return {
     trip,
     popularTrips: mapAppwriteTrips(trips.allTrips),
   };
 };
 
-const TripDetails = ({ loaderData }: Route.ComponentProps) => {
-  const tripData = parseTripData(loaderData?.trip?.tripDetail);
+const TravelTripDetails = ({ loaderData }: Route.ComponentProps) => {
+  const tripData = parseTripData(loaderData.trip.tripDetail);
 
   if (!tripData) {
     return (
       <main className="travel-detail wrapper">
-        <Header
-          title="Trip Details"
-          description="View and edit AI-generated travel plans"
-        />
         <p className="text-center text-dark-400">Unable to load trip details.</p>
       </main>
     );
   }
 
-  const imageUrls = loaderData?.trip?.imageUrls ?? [];
+  const imageUrls = loaderData.trip.imageUrls ?? [];
 
   return (
     <main className="travel-detail wrapper">
-      <Header
-        title="Trip Details"
-        description="View and edit AI-generated travel plans"
-      />
+      <Link to="/" className="back-link">
+        <img src="/assets/icons/arrow-left.svg" alt="" />
+        <span>Back to Home</span>
+      </Link>
 
       <TripDetailsBody tripData={tripData} imageUrls={imageUrls} />
 
@@ -68,4 +69,4 @@ const TripDetails = ({ loaderData }: Route.ComponentProps) => {
   );
 };
 
-export default TripDetails;
+export default TravelTripDetails;
