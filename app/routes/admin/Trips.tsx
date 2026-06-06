@@ -32,7 +32,7 @@ const Trips = ({ loaderData }: Route.ComponentProps) => {
       <Header
         title="Explore Your Trips"
         description="View, edit, and optimize AI-generated travel itineraries all in one place."
-        ctaUrl="/trips/create"
+        ctaUrl="/admin/trips/create"
         ctaText="Create New Trip"
         icon={<LuPlus className="size-6" />}
       />

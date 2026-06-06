@@ -16,19 +16,19 @@ export const sidebarItems: SidebarItem[] = [
     id: 1,
     icon: LuHouse,
     label: "Dashboard",
-    href: "/dashboard",
+    href: "/admin/dashboard",
   },
   {
     id: 3,
     icon: LuUsers,
     label: " Users",
-    href: "/all-users",
+    href: "/admin/all-users",
   },
   {
     id: 4,
     icon: LuEarth,
     label: "Trips",
-    href: "/trips",
+    href: "/admin/trips",
   },
 ];
 

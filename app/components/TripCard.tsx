@@ -10,16 +10,19 @@ const TripCard = ({
   name,
   price,
   tags,
-}: TripCardProps) => {
+  linkTo,
+}: TripCardProps & { linkTo?: string }) => {
   const path = useLocation();
+  const resolveTo = () => {
+    if (linkTo) return linkTo;
+    if (path.pathname === "/" || path.pathname.startsWith("/travel") || path.pathname === "/trips")
+      return `/travel/${id}`;
+    return `/admin/trips/${id}`;
+  };
   return (
     <Link
       className="trip-card"
-      to={
-        path.pathname == "/" || path.pathname.startsWith("/travel")
-          ? `/travel/${id}`
-          : `/trips/${id}`
-      }
+      to={resolveTo()}
     >
       <img src={imageUrl} alt={name} />
 
