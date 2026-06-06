@@ -1,9 +1,6 @@
 import { Link } from "react-router";
 import { Button } from "~/components/ui/button";
-
-interface LandingHeroProps {
-  currentUser?: Record<string, any> | null;
-}
+import { useUser } from "lib/useCurrentUser";
 
 const STATS = [
   { value: "10K+", label: "Trips Created" },
@@ -12,7 +9,9 @@ const STATS = [
   { value: "AI", label: "Powered Planning" },
 ];
 
-const LandingHero = ({ currentUser }: LandingHeroProps) => {
+const LandingHero = () => {
+  const currentUser = useUser();
+
   if (currentUser) {
     return (
       <section className="relative overflow-hidden bg-hero bg-cover bg-center bg-no-repeat">

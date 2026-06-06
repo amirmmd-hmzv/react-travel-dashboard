@@ -3,11 +3,11 @@ import { Link } from "react-router";
 import { Button } from "~/components/ui/button";
 import LogoutConfirmDialog from "~/components/LogoutConfirmDialog";
 
-interface LandingNavProps {
+interface SiteHeaderProps {
   currentUser?: Record<string, any> | null;
 }
 
-const LandingNav = ({ currentUser }: LandingNavProps) => {
+const SiteHeader = ({ currentUser }: SiteHeaderProps) => {
 
   console.log(currentUser)
   const [logoutOpen, setLogoutOpen] = useState(false);
@@ -75,4 +75,4 @@ const LandingNav = ({ currentUser }: LandingNavProps) => {
   );
 };
 
-export default LandingNav;
+export default SiteHeader;

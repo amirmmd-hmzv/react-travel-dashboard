@@ -1,6 +1,6 @@
 import { Link } from "react-router";
 
-const LandingFooter = () => {
+const SiteFooter = () => {
   return (
     <footer className="bg-dark-100 text-white py-12">
       <div className="wrapper flex flex-col md:flex-row items-center justify-between gap-6">
@@ -23,4 +23,4 @@ const LandingFooter = () => {
   );
 };
 
-export default LandingFooter;
+export default SiteFooter;

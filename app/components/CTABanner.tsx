@@ -1,11 +1,10 @@
 import { Link } from "react-router";
 import { Button } from "~/components/ui/button";
+import { useUser } from "lib/useCurrentUser";
 
-interface CTABannerProps {
-  currentUser?: Record<string, any> | null;
-}
+const CTABanner = () => {
+  const currentUser = useUser();
 
-const CTABanner = ({ currentUser }: CTABannerProps) => {
   return (
     <section className="py-20">
       <div className="wrapper">
