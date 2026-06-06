@@ -1,6 +1,7 @@
 import { Link, redirect, type MetaFunction } from "react-router";
 import { getTripById, mapAppwriteTrips, type AppwriteTripDocument } from "lib/appwrite/trips";
 import { getUser } from "lib/appwrite/auth";
+import { getPillItems } from "lib/tripDetails";
 import StarRating from "~/components/StarRating";
 import InfoPill from "~/components/InfoPill";
 import Chip from "~/components/ui/Cheap";
@@ -65,29 +66,6 @@ export async function loader({ params }: Route.LoaderArgs) {
   return { trip, currentUser };
 }
 
-// ── helpers ──────────────────────────────────────────────────────────────────
-const TAG_COLOR_MAP: Record<string, "pink" | "primary"> = {
-  nature: "primary",
-  culture: "primary",
-  cultural: "primary",
-  historical: "primary",
-  relaxed: "primary",
-  luxury: "primary",
-  premium: "primary",
-  adventure: "pink",
-  hiking: "pink",
-  nightlife: "pink",
-  food: "pink",
-  city: "pink",
-  couple: "pink",
-  family: "pink",
-  solo: "pink",
-};
-
-function tagColor(tag: string): "pink" | "primary" {
-  return TAG_COLOR_MAP[tag?.toLowerCase()] ?? "primary";
-}
-
 export default function TravelTripDetails({ loaderData }: Route.ComponentProps) {
   const { trip, currentUser } = loaderData;
 
@@ -95,52 +73,44 @@ export default function TravelTripDetails({ loaderData }: Route.ComponentProps) 
 
   const images: string[] = trip.imageUrls ?? [];
   const itinerary: any[] = trip.itinerary ?? [];
-  const tags: string[] = [
-    trip.travelStyle,
-    trip.interests,
-    trip.groupType,
-    trip.budget,
-  ].filter(Boolean);
-
-  const price = trip.estimatedPrice;
   const duration = itinerary.length;
+  const price = trip.estimatedPrice;
+  const pillItems = getPillItems({
+    travelStyle: trip.travelStyle,
+    groupType: trip.groupType,
+    budget: trip.budget,
+    interests: trip.interests,
+  });
 
   return (
     <>
       <TripDetailNav />
 
       <div className="wrapper py-10 travel-detail">
-        {/* ── Hero title ── */}
-        <div className="mb-8">
+        {/* ── Header ── */}
+        <header className="mb-8">
           <h1 className="font-clash-display text-dark-100 text-4xl md:text-5xl font-bold leading-tight mb-4">
             {trip.name}
           </h1>
-
-          <div className="flex flex-wrap items-center gap-4 text-dark-400 font-plus-jakarta text-sm">
+          <div className="flex items-center gap-5">
             {duration > 0 && (
-              <span className="flex items-center gap-1.5">
-                <img src="/assets/icons/calendar.svg" alt="" className="h-4 w-4" />
-                {duration} day{duration !== 1 ? "s" : ""}
-              </span>
+              <InfoPill
+                text={`${duration} day plan`}
+                image="/assets/icons/calendar.svg"
+              />
             )}
             {trip.location && (
-              <span className="flex items-center gap-1.5">
-                <img src="/assets/icons/location-mark.svg" alt="" className="h-4 w-4" />
-                {typeof trip.location === "string"
-                  ? trip.location
-                  : [trip.location.city, trip.country]
-                      .filter(Boolean)
-                      .join(", ")}
-              </span>
-            )}
-            {trip.rating && (
-              <span className="flex items-center gap-1.5">
-                <StarRating rating={trip.rating} />
-                <span className="text-dark-400">{trip.rating}/5</span>
-              </span>
+              <InfoPill
+                text={
+                  typeof trip.location === "string"
+                    ? trip.location
+                    : [trip.location.city, trip.country].filter(Boolean).join(", ")
+                }
+                image="/assets/icons/location-mark.svg"
+              />
             )}
           </div>
-        </div>
+        </header>
 
         {/* ── Two-column layout ── */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
@@ -148,115 +118,121 @@ export default function TravelTripDetails({ loaderData }: Route.ComponentProps) 
           <div className="lg:col-span-2 flex flex-col gap-8">
             {/* Gallery */}
             {images.length > 0 && (
-              <div className="grid grid-cols-2 gap-3 rounded-[20px] overflow-hidden">
-                <div className="col-span-2 sm:col-span-1 row-span-2 aspect-[4/3] sm:aspect-auto">
+              <section className="grid grid-cols-1 md:grid-cols-3 gap-3 rounded-[20px] overflow-hidden">
+                {images.map((url: string, i: number) => (
                   <img
-                    src={images[0]}
-                    alt={trip.name}
-                    className="w-full h-full object-cover min-h-[260px]"
+                    key={i}
+                    src={url}
+                    alt={`${trip.name} ${i + 1}`}
+                    className={
+                      i === 0
+                        ? "md:col-span-2 md:row-span-2 w-full h-82.5 object-cover"
+                        : "md:row-span-1 w-full h-37.5 object-cover"
+                    }
                   />
-                </div>
-                {images.slice(1, 3).map((src, i) => (
-                  <div key={i} className="aspect-[4/3]">
-                    <img
-                      src={src}
-                      alt={`${trip.name} ${i + 2}`}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
                 ))}
-              </div>
+              </section>
             )}
 
-            {/* Tags */}
-            {tags.length > 0 && (
-              <div className="flex flex-wrap gap-2">
-                {tags.map((tag) => (
-                  <Chip key={tag} variant="outline" color={tagColor(tag)}>
-                    {tag}
+            {/* Pill chips */}
+            {pillItems.length > 0 && (
+              <section className="flex gap-3 md:gap-5 items-center flex-wrap">
+                {pillItems.map((pill, i) => (
+                  <Chip
+                    key={i}
+                    variant="custom"
+                    className={`${pill.bg} !text-base !font-medium !px-4`}
+                  >
+                    {pill.text}
                   </Chip>
                 ))}
-              </div>
+                {trip.rating != null && (
+                  <>
+                    <StarRating rating={trip.rating} />
+                    <Chip className="!bg-yellow-50 !text-yellow-700 !border-yellow-100">
+                      {trip.rating.toFixed(1)}/5
+                    </Chip>
+                  </>
+                )}
+              </section>
             )}
 
-            {/* About */}
-            {trip.description && (
-              <div className="bg-white rounded-[20px] p-7 shadow-300">
-                <h2 className="font-clash-display text-dark-100 text-2xl font-semibold mb-4">
-                  About This Trip
-                </h2>
-                <p className="font-plus-jakarta text-dark-400 text-sm leading-relaxed">
-                  {trip.description}
+            {/* Title section */}
+            <section className="title">
+              <article>
+                <h3 className="font-clash-display text-dark-100 text-2xl font-semibold">
+                  {duration}-Day {trip.country} {trip.travelStyle} Trip
+                </h3>
+                <p className="font-plus-jakarta text-dark-400 text-sm">
+                  {[trip.budget, trip.groupType, trip.interests].filter(Boolean).join(", ")}
                 </p>
-              </div>
+              </article>
+              <h2 className="font-clash-display text-dark-100 text-3xl font-bold mt-2">
+                {price}
+              </h2>
+            </section>
+
+            {/* Description */}
+            {trip.description && (
+              <p className="text-sm md:text-lg font-normal text-dark-400 leading-relaxed">
+                {trip.description}
+              </p>
             )}
 
             {/* Day-by-day itinerary */}
             {itinerary.length > 0 && (
-              <div className="bg-white rounded-[20px] p-7 shadow-300">
-                <h2 className="font-clash-display text-dark-100 text-2xl font-semibold mb-6">
-                  Day-by-Day Itinerary
-                </h2>
-                <ol className="flex flex-col gap-6">
-                  {itinerary.map((day: any, idx: number) => (
-                    <li key={idx} className="flex gap-4">
-                      {/* Step indicator */}
-                      <div className="flex flex-col items-center gap-1 flex-shrink-0">
-                        <div className="w-8 h-8 rounded-full bg-primary-50 border-2 border-primary-100 flex items-center justify-center">
-                          <span className="font-clash-display text-primary-100 text-xs font-bold">
-                            {idx + 1}
+              <ul className="flex flex-col gap-6">
+                {itinerary.map((dayPlan: any, index: number) => (
+                  <li key={index} className="flex flex-col gap-2">
+                    <h3 className="font-clash-display text-dark-100 text-lg font-semibold">
+                      Day {dayPlan.day ?? index + 1}: {dayPlan.location}
+                    </h3>
+                    <ul className="flex flex-col gap-1.5">
+                      {dayPlan.activities.map((activity: any, ai: number) => (
+                        <li key={ai} className="flex items-start gap-2 font-plus-jakarta text-dark-400 text-sm">
+                          <span className="font-semibold text-dark-100 flex-shrink-0">
+                            {activity.time}
                           </span>
-                        </div>
-                        {idx < itinerary.length - 1 && (
-                          <div className="w-px flex-1 bg-light-300 min-h-[24px]" />
-                        )}
-                      </div>
-
-                      <div className="pb-2 flex-1">
-                        <div className="flex items-start justify-between gap-2 mb-1">
-                          <h3 className="font-clash-display text-dark-100 text-base font-semibold">
-                            {day.title ?? `Day ${idx + 1}`}
-                          </h3>
-                          {day.location && (
-                            <span className="font-plus-jakarta text-gray-100 text-xs flex items-center gap-1 flex-shrink-0">
-                              <img
-                                src="/assets/icons/location-mark.svg"
-                                alt=""
-                                className="h-3 w-3"
-                              />
-                              {day.location}
-                            </span>
-                          )}
-                        </div>
-                        {day.description && (
-                          <p className="font-plus-jakarta text-dark-400 text-sm leading-relaxed">
-                            {day.description}
-                          </p>
-                        )}
-                        {Array.isArray(day.activities) && day.activities.length > 0 && (
-                          <ul className="mt-2 flex flex-col gap-1">
-                            {day.activities.map((act: Activity, ai: number) => (
-                              <li
-                                key={ai}
-                                className="flex items-start gap-2 font-plus-jakarta text-dark-400 text-xs"
-                              >
-                                <img
-                                  src="/assets/icons/blue-check.svg"
-                                  alt=""
-                                  className="h-3.5 w-3.5 mt-0.5 flex-shrink-0"
-                                />
-                                <span className="font-semibold text-dark-100 mr-1">{act.time}</span>
-                                {act.description}
-                              </li>
-                            ))}
-                          </ul>
-                        )}
-                      </div>
-                    </li>
-                  ))}
-                </ol>
-              </div>
+                          <p className="grow">{activity.description}</p>
+                        </li>
+                      ))}
+                    </ul>
+                  </li>
+                ))}
+              </ul>
             )}
+
+            {/* Visit time & weather */}
+            <section className="visit">
+              {trip.bestTimeToVisit && trip.bestTimeToVisit.length > 0 && (
+                <div>
+                  <h3 className="font-clash-display text-dark-100 text-lg font-semibold mb-2">
+                    Best Time to Visit:
+                  </h3>
+                  <ul className="flex flex-col gap-1">
+                    {trip.bestTimeToVisit.map((item: string, i: number) => (
+                      <li key={i} className="font-plus-jakarta text-dark-400 text-sm">
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              {trip.weatherInfo && trip.weatherInfo.length > 0 && (
+                <div className="mt-4">
+                  <h3 className="font-clash-display text-dark-100 text-lg font-semibold mb-2">
+                    Weather:
+                  </h3>
+                  <ul className="flex flex-col gap-1">
+                    {trip.weatherInfo.map((item: string, i: number) => (
+                      <li key={i} className="font-plus-jakarta text-dark-400 text-sm">
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </section>
           </div>
 
           {/* ── RIGHT: sticky booking card ── */}
@@ -273,7 +249,7 @@ export default function TravelTripDetails({ loaderData }: Route.ComponentProps) 
                   </p>
                   <p className="font-plus-jakarta text-gray-100 text-xs">per person</p>
                 </div>
-                {trip.rating && (
+                {trip.rating != null && (
                   <div className="flex flex-col items-end gap-1">
                     <StarRating rating={trip.rating} />
                     <span className="font-plus-jakarta text-gray-100 text-xs">
@@ -285,7 +261,7 @@ export default function TravelTripDetails({ loaderData }: Route.ComponentProps) 
 
               <div className="border-t border-light-300" />
 
-              {/* Trip summary pills */}
+              {/* Trip summary */}
               <div className="flex flex-col gap-2">
                 {duration > 0 && (
                   <div className="flex items-center justify-between font-plus-jakarta text-sm">
@@ -325,11 +301,9 @@ export default function TravelTripDetails({ loaderData }: Route.ComponentProps) 
 
               {/* Booking CTA */}
               {currentUser ? (
-                // When Stripe is live: change this to a <form method="post"> with action pointing here
                 <div className="flex flex-col gap-3">
                   <Button
                     className="w-full bg-primary-100 hover:bg-primary-500 text-white font-plus-jakarta font-semibold py-3 rounded-lg text-sm transition-colors"
-                    // onClick={() => { /* submit Stripe form */ }}
                     disabled
                     title="Payments coming soon"
                   >
@@ -381,9 +355,7 @@ export default function TravelTripDetails({ loaderData }: Route.ComponentProps) 
             </div>
           </div>
         </div>
-
       </div>
-
     </>
   );
 }

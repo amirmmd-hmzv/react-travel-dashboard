@@ -18,7 +18,7 @@ const SiteHeader = ({ currentUser }: SiteHeaderProps) => {
         <div className="wrapper flex items-center justify-between h-16">
           <Link to="/" className="flex items-center gap-2">
             <img src="/assets/icons/logo.svg" alt="Teal Horizon" className="h-8 w-8" />
-            <span className="font-clash-display text-xl font-semibold text-dark-100">
+            <span className="font-clash-display text-primary-100 text-xl font-semibold text-dark-100">
               Teal Horizon
             </span>
           </Link>

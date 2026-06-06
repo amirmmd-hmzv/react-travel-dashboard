@@ -1,4 +1,5 @@
-import { cn, getFirstWord } from "lib/utils";
+import { cn } from "lib/utils";
+import { getPillItems } from "lib/tripDetails";
 import { InfoPill, StarRating } from "~/components";
 import Chip from "~/components/ui/Cheap";
 
@@ -24,12 +25,7 @@ const TripDetailsBody = ({ tripData, imageUrls }: TripDetailsBodyProps) => {
     rating = 0,
   } = tripData;
 
-  const pillItems = [
-    { text: travelStyle, bg: "!bg-pink-50 !text-pink-500" },
-    { text: groupType, bg: "!bg-primary-50 !text-primary-500" },
-    { text: budget, bg: "!bg-success-50 !text-success-700" },
-    { text: interests, bg: "!bg-navy-50 !text-navy-500" },
-  ];
+  const pillItems = getPillItems({ travelStyle, groupType, budget, interests });
 
   const visitTimeAndWeatherInfo = [
     { title: "Best Time to Visit:", items: bestTimeToVisit },
@@ -80,7 +76,7 @@ const TripDetailsBody = ({ tripData, imageUrls }: TripDetailsBodyProps) => {
             variant="custom"
             className={`${pill.bg} !text-base !font-medium !px-4`}
           >
-            {getFirstWord(pill.text)}
+            {pill.text}
           </Chip>
         ))}
 
