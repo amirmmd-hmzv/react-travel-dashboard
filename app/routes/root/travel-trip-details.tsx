@@ -1,7 +1,13 @@
-import { Link, redirect, type MetaFunction } from "react-router";
-import { getTripById, mapAppwriteTrips, type AppwriteTripDocument } from "lib/appwrite/trips";
-import { getUser } from "lib/appwrite/auth";
+import { Link, useNavigate, type MetaFunction } from "react-router";
+import { useState } from "react";
+import {
+  getTripById,
+  mapAppwriteTrips,
+  type AppwriteTripDocument,
+} from "lib/appwrite/trips";
+import { createBooking } from "lib/appwrite/bookings";
 import { getPillItems } from "lib/tripDetails";
+import { useUser } from "lib/useCurrentUser";
 import StarRating from "~/components/StarRating";
 import InfoPill from "~/components/InfoPill";
 import Chip from "~/components/ui/Cheap";
@@ -9,65 +15,36 @@ import { Button } from "~/components/ui/button";
 import TripDetailNav from "~/components/TripDetailNav";
 import type { Route } from "./+types/travel-trip-details";
 
-// ─── Stripe checkout action ──────────────────────────────────────────────────
-// Uncomment and fill in once Stripe is wired up:
-//
-// import Stripe from "stripe";
-// const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
-//
-// export async function action({ request, params }: Route.ActionArgs) {
-//   const user = await getUser();
-//   if (!user) return redirect("/sign-in");
-//
-//   const trip = await getTripById(params.tripId);
-//   if (!trip) throw new Response("Not Found", { status: 404 });
-//
-//   const session = await stripe.checkout.sessions.create({
-//     payment_method_types: ["card"],
-//     mode: "payment",
-//     customer_email: user.email,
-//     line_items: [
-//       {
-//         price_data: {
-//           currency: "usd",
-//           product_data: {
-//             name: trip.name,
-//             images: [trip.imageUrls?.[0]].filter(Boolean),
-//           },
-//           unit_amount: Math.round((trip.estimatedPrice ?? 0) * 100),
-//         },
-//         quantity: 1,
-//       },
-//     ],
-//     success_url: `${process.env.APP_URL}/payment/success?session_id={CHECKOUT_SESSION_ID}&tripId=${params.tripId}`,
-//     cancel_url: `${process.env.APP_URL}/travel/${params.tripId}`,
-//   });
-//
-//   return redirect(session.url!);
-// }
-
 export const meta: MetaFunction = ({ data }) => [
-  { title: (data as any)?.trip?.name ? `${(data as any).trip.name} — Teal Horizon` : "Trip — Teal Horizon" },
+  {
+    title: (data as any)?.trip?.name
+      ? `${(data as any).trip.name} — Teal Horizon`
+      : "Trip — Teal Horizon",
+  },
 ];
 
 export async function loader({ params }: Route.LoaderArgs) {
-  const [rawTrip, user] = await Promise.allSettled([
-    getTripById(params.tripId),
-    getUser(),
-  ]);
+  const rawTrip = await getTripById(params.tripId);
 
-  if (rawTrip.status === "rejected" || !rawTrip.value) {
+  if (!rawTrip) {
     throw new Response("Not Found", { status: 404 });
   }
 
-  const [trip] = mapAppwriteTrips([rawTrip.value as unknown as AppwriteTripDocument]);
-  const currentUser = user.status === "fulfilled" ? user.value : null;
+  const [trip] = mapAppwriteTrips([
+    rawTrip as unknown as AppwriteTripDocument,
+  ]);
 
-  return { trip, currentUser };
+  return { trip };
 }
 
-export default function TravelTripDetails({ loaderData }: Route.ComponentProps) {
-  const { trip, currentUser } = loaderData;
+export default function TravelTripDetails({
+  loaderData,
+}: Route.ComponentProps) {
+  const { trip } = loaderData;
+  const currentUser = useUser();
+
+  const navigate = useNavigate();
+  const [booking, setBooking] = useState(false);
 
   if (!trip) return null;
 
@@ -81,6 +58,19 @@ export default function TravelTripDetails({ loaderData }: Route.ComponentProps) 
     budget: trip.budget,
     interests: trip.interests,
   });
+
+  async function handleBooking() {
+    const uid = currentUser?.accountId;
+    if (!uid) return;
+    setBooking(true);
+    try {
+      const sessionId = `cs_fake_${crypto.randomUUID()}`;
+      await createBooking(uid, trip, sessionId);
+      navigate(`/payment/success?sessionId=${sessionId}&tripId=${trip.id}`);
+    } catch {
+      setBooking(false);
+    }
+  }
 
   return (
     <>
@@ -104,7 +94,9 @@ export default function TravelTripDetails({ loaderData }: Route.ComponentProps) 
                 text={
                   typeof trip.location === "string"
                     ? trip.location
-                    : [trip.location.city, trip.country].filter(Boolean).join(", ")
+                    : [trip.location.city, trip.country]
+                        .filter(Boolean)
+                        .join(", ")
                 }
                 image="/assets/icons/location-mark.svg"
               />
@@ -164,7 +156,9 @@ export default function TravelTripDetails({ loaderData }: Route.ComponentProps) 
                   {duration}-Day {trip.country} {trip.travelStyle} Trip
                 </h3>
                 <p className="font-plus-jakarta text-dark-400 text-sm">
-                  {[trip.budget, trip.groupType, trip.interests].filter(Boolean).join(", ")}
+                  {[trip.budget, trip.groupType, trip.interests]
+                    .filter(Boolean)
+                    .join(", ")}
                 </p>
               </article>
               <h2 className="font-clash-display text-dark-100 text-3xl font-bold mt-2">
@@ -189,7 +183,10 @@ export default function TravelTripDetails({ loaderData }: Route.ComponentProps) 
                     </h3>
                     <ul className="flex flex-col gap-1.5">
                       {dayPlan.activities.map((activity: any, ai: number) => (
-                        <li key={ai} className="flex items-start gap-2 font-plus-jakarta text-dark-400 text-sm">
+                        <li
+                          key={ai}
+                          className="flex items-start gap-2 font-plus-jakarta text-dark-400 text-sm"
+                        >
                           <span className="font-semibold text-dark-100 flex-shrink-0">
                             {activity.time}
                           </span>
@@ -211,7 +208,10 @@ export default function TravelTripDetails({ loaderData }: Route.ComponentProps) 
                   </h3>
                   <ul className="flex flex-col gap-1">
                     {trip.bestTimeToVisit.map((item: string, i: number) => (
-                      <li key={i} className="font-plus-jakarta text-dark-400 text-sm">
+                      <li
+                        key={i}
+                        className="font-plus-jakarta text-dark-400 text-sm"
+                      >
                         {item}
                       </li>
                     ))}
@@ -225,7 +225,10 @@ export default function TravelTripDetails({ loaderData }: Route.ComponentProps) 
                   </h3>
                   <ul className="flex flex-col gap-1">
                     {trip.weatherInfo.map((item: string, i: number) => (
-                      <li key={i} className="font-plus-jakarta text-dark-400 text-sm">
+                      <li
+                        key={i}
+                        className="font-plus-jakarta text-dark-400 text-sm"
+                      >
                         {item}
                       </li>
                     ))}
@@ -245,9 +248,11 @@ export default function TravelTripDetails({ loaderData }: Route.ComponentProps) 
                     Starting from
                   </p>
                   <p className="font-clash-display text-dark-100 text-3xl font-bold">
-                    ${price?.toLocaleString?.() ?? price}
+                    {price?.toLocaleString?.() ?? price}
                   </p>
-                  <p className="font-plus-jakarta text-gray-100 text-xs">per person</p>
+                  <p className="font-plus-jakarta text-gray-100 text-xs">
+                    per person
+                  </p>
                 </div>
                 {trip.rating != null && (
                   <div className="flex flex-col items-end gap-1">
@@ -300,17 +305,18 @@ export default function TravelTripDetails({ loaderData }: Route.ComponentProps) 
               <div className="border-t border-light-300" />
 
               {/* Booking CTA */}
+
               {currentUser ? (
                 <div className="flex flex-col gap-3">
                   <Button
                     className="w-full bg-primary-100 hover:bg-primary-500 text-white font-plus-jakarta font-semibold py-3 rounded-lg text-sm transition-colors"
-                    disabled
-                    title="Payments coming soon"
+                    disabled={booking}
+                    onClick={handleBooking}
                   >
-                    Book This Trip
+                    {booking ? "Booking..." : "Book This Trip"}
                   </Button>
                   <p className="font-plus-jakarta text-gray-100 text-xs text-center">
-                    🔒 Secure checkout via Stripe — coming soon
+                    🔒 Secure checkout — no real payment processed
                   </p>
                 </div>
               ) : (

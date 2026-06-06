@@ -18,7 +18,7 @@ const SiteHeader = ({ currentUser }: SiteHeaderProps) => {
         <div className="wrapper flex items-center justify-between h-16">
           <Link to="/" className="flex items-center gap-2">
             <img src="/assets/icons/logo.svg" alt="Teal Horizon" className="h-8 w-8" />
-            <span className="font-clash-display text-primary-100 text-xl font-semibold text-dark-100">
+            <span className="font-clash-display text-primary-100 text-xl font-semibold ">
               Teal Horizon
             </span>
           </Link>
@@ -33,11 +33,19 @@ const SiteHeader = ({ currentUser }: SiteHeaderProps) => {
 
             {currentUser ? (
               <>
-                <Link to="/admin/dashboard">
-                  <Button className="hidden sm:inline-flex bg-primary-100 hover:bg-primary-500 text-white rounded-lg text-sm px-4 py-2">
-                    Dashboard
-                  </Button>
+                <Link
+                  to="/my-bookings"
+                  className="hidden sm:block text-dark-400 font-plus-jakarta text-sm hover:text-primary-100 transition-colors"
+                >
+                  My Bookings
                 </Link>
+                {currentUser?.status === "admin" && (
+                  <Link to="/admin/dashboard">
+                    <Button className="hidden sm:inline-flex bg-primary-100 hover:bg-primary-500 text-white rounded-lg text-sm px-4 py-2">
+                      Dashboard
+                    </Button>
+                  </Link>
+                )}
                 <div className="flex items-center gap-2">
                   <img
                     src={currentUser.imageUrl || ""}
@@ -52,7 +60,7 @@ const SiteHeader = ({ currentUser }: SiteHeaderProps) => {
                   </span>
                   <button
                     onClick={() => setLogoutOpen(true)}
-                    className="text-dark-400 hover:text-red-500 transition-colors"
+                    className="text-dark-400 hover:text-red-500 transition-colors cursor-pointer"
                     title="Logout"
                   >
                     <img src="/assets/icons/logout.svg" alt="Logout" className="h-5 w-5" />

@@ -2,7 +2,7 @@ import { Link } from "react-router";
 
 const SiteFooter = () => {
   return (
-    <footer className="bg-dark-100 text-white py-12">
+    <footer className="bg-dark-100 text-white py-12 mt-auto">
       <div className="wrapper flex flex-col md:flex-row items-center justify-between gap-6">
         <div className="flex items-center gap-2">
           <img src="/assets/icons/logo.svg" alt="Teal Horizon" className="h-7 w-7" />
