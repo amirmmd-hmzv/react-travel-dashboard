@@ -2,23 +2,23 @@ const STEPS = [
   {
     step: "01",
     icon: "/assets/icons/magic-star.svg",
-    title: "Describe Your Dream",
+    title: "Expert Curation",
     description:
-      "Tell our AI where you want to go, your budget, travel style, and who you're travelling with.",
+      "Our team uses AI to craft detailed day-by-day itineraries tailored to every travel style and budget.",
   },
   {
     step: "02",
     icon: "/assets/icons/itinerary.svg",
-    title: "AI Builds Your Plan",
+    title: "Browse & Compare",
     description:
-      "Gemini AI crafts a full day-by-day itinerary with curated activities, restaurants, and tips.",
+      "Explore trips by destination, style, budget, and duration. Find the perfect match for your next getaway.",
   },
   {
     step: "03",
     icon: "/assets/icons/destination.svg",
-    title: "Pack & Explore",
+    title: "Book Your Adventure",
     description:
-      "Download your personalised itinerary and set off — everything you need, in one place.",
+      "Purchase your chosen itinerary via secure checkout and get ready to explore.",
   },
 ];
 
@@ -28,7 +28,7 @@ const HowItWorks = () => {
       <div className="wrapper">
         <div className="text-center mb-14">
           <p className="font-plus-jakarta text-primary-100 text-sm font-semibold uppercase tracking-widest mb-2">
-            Simple & Fast
+            How It Works
           </p>
           <h2 className="font-clash-display text-dark-100 text-4xl font-bold">
             How Teal Horizon Works

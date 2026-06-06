@@ -32,7 +32,7 @@ const LandingHero = ({ currentUser }: LandingHeroProps) => {
           </h1>
 
           <p className="font-plus-jakarta text-white/80 text-lg md:text-xl max-w-2xl leading-relaxed">
-            Plan another unforgettable trip with AI. Your past itineraries and preferences are ready to guide you.
+            Browse new AI-crafted itineraries or pick up where you left off. Expert-crafted trips, ready for you.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-3 mt-2">
@@ -74,30 +74,29 @@ const LandingHero = ({ currentUser }: LandingHeroProps) => {
         </span>
 
         <h1 className="font-clash-display text-white text-5xl md:text-6xl lg:text-7xl font-bold max-w-4xl leading-[1.1]">
-          Plan Your Perfect{" "}
+          Discover Curated{" "}
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-navy-500 to-primary-100">
-            Journey
+            AI-Crafted
           </span>{" "}
-          with AI
+          Trips
         </h1>
 
         <p className="font-plus-jakarta text-white/80 text-lg md:text-xl max-w-2xl leading-relaxed">
-          Describe your dream destination and let our AI build a personalised,
-          day-by-day itinerary in seconds — with photos, weather, and local tips included.
+          Expert-crafted itineraries powered by AI. Browse our collection of personalized trip plans and book your next adventure.
         </p>
 
         <div className="flex flex-col sm:flex-row gap-3 mt-2">
-          <Link to="/sign-in">
+          <Link to="/trips">
             <Button className="bg-primary-100 hover:bg-primary-500 text-white font-plus-jakarta font-semibold px-8 py-3 rounded-lg text-base shadow-500 transition-all">
-              Get Started Free
+              Browse Trips
             </Button>
           </Link>
-          <Link to="/trips">
+          <Link to="/sign-in">
             <Button
               variant="outline"
               className="bg-white/10 backdrop-blur border-white/30 text-white hover:bg-white/20 font-plus-jakarta font-semibold px-8 py-3 rounded-lg text-base transition-all"
             >
-              Browse Trips
+              Sign In
             </Button>
           </Link>
         </div>
