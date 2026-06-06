@@ -1,33 +1,44 @@
 import { Link, type MetaFunction } from "react-router";
 import { useEffect, useState } from "react";
-import { useUser } from "lib/useCurrentUser";
+import { getUser } from "lib/appwrite/auth";
 import { getUserBookings, type Booking } from "lib/appwrite/bookings";
+import { TripCardSkeleton } from "~/components";
 
 export const meta: MetaFunction = () => [
   { title: "My Bookings — Teal Horizon" },
 ];
 
 export default function MyBookings() {
-  const currentUser = useUser();
-  const [bookings, setBookings] = useState<Booking[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [state, setState] = useState<{
+    loading: boolean;
+    bookings: Booking[];
+  }>({ loading: true, bookings: [] });
 
   useEffect(() => {
-    if (!currentUser?.accountId) {
-      setLoading(false);
-      return;
+    let cancelled = false;
+
+    async function load() {
+      try {
+        const user = await getUser();
+        if (cancelled) return;
+
+        if (!user || user instanceof Response || !user.accountId) {
+          setState({ loading: false, bookings: [] });
+          return;
+        }
+
+        const bookings = await getUserBookings(user.accountId);
+        if (!cancelled) setState({ loading: false, bookings });
+      } catch {
+        if (!cancelled) setState({ loading: false, bookings: [] });
+      }
     }
 
-    let cancelled = false;
-    getUserBookings(currentUser.accountId).then((data) => {
-      if (!cancelled) {
-        setBookings(data);
-        setLoading(false);
-      }
-    });
-
+    load();
     return () => { cancelled = true; };
-  }, [currentUser?.accountId]);
+  }, []);
+
+  const { loading, bookings } = state;
 
   return (
     <div className="wrapper py-10">
@@ -35,14 +46,22 @@ export default function MyBookings() {
         <h1 className="font-clash-display text-dark-100 text-4xl md:text-5xl font-bold leading-tight">
           My Bookings
         </h1>
-        <p className="font-plus-jakarta text-dark-400 text-sm mt-2">
-          {loading
-            ? "Loading your bookings..."
-            : bookings.length > 0
+        {!loading && (
+          <p className="font-plus-jakarta text-dark-400 text-sm mt-2">
+            {bookings.length > 0
               ? `You have ${bookings.length} booked trip${bookings.length !== 1 ? "s" : ""}.`
               : "You haven't booked any trips yet."}
-        </p>
+          </p>
+        )}
       </div>
+
+      {loading && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <TripCardSkeleton key={i} />
+          ))}
+        </div>
+      )}
 
       {!loading && bookings.length === 0 && (
         <div className="flex flex-col items-center justify-center py-24 gap-6">
@@ -64,7 +83,7 @@ export default function MyBookings() {
         </div>
       )}
 
-      {bookings.length > 0 && (
+      {!loading && bookings.length > 0 && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {bookings.map((booking) => (
             <Link

@@ -1,6 +1,7 @@
 import { getAllTrips, getTripById, mapAppwriteTrips } from "lib/appwrite/trips";
 import { parseTripData } from "lib/utils";
-import { Header, TripCard } from "~/components";
+import { useNavigation } from "react-router";
+import { Header, TripCard, TripCardSkeleton } from "~/components";
 import TripDetailsBody from "~/components/TripDetailsBody";
 import type { Route } from "./+types/trip-details";
 
@@ -23,6 +24,8 @@ export const loader = async ({ params }: { params: { tripId: string } }) => {
 };
 
 const TripDetails = ({ loaderData }: Route.ComponentProps) => {
+  const navigation = useNavigation();
+  const isLoading = navigation.state === "loading";
   const tripData = parseTripData(loaderData?.trip?.tripDetail);
 
   if (!tripData) {
@@ -51,7 +54,9 @@ const TripDetails = ({ loaderData }: Route.ComponentProps) => {
       <section className="flex flex-col gap-6">
         <h2 className="p-24-semibold text-dark-100">Popular Trips</h2>
         <div className="trip-grid">
-          {loaderData.popularTrips.map((trip) => (
+          {isLoading
+            ? Array.from({ length: 4 }).map((_, i) => <TripCardSkeleton key={i} />)
+            : loaderData.popularTrips.map((trip) => (
             <TripCard
               key={trip.id}
               id={trip.id}

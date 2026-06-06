@@ -1,6 +1,7 @@
-import { Link, type MetaFunction, useSearchParams } from "react-router";
+import { Link, useNavigation, type MetaFunction, useSearchParams } from "react-router";
 import { getAllTrips, mapAppwriteTrips } from "lib/appwrite/trips";
 import TripCard from "~/components/TripCard";
+import { TripCardSkeleton } from "~/components";
 import AppPagination from "~/components/AppPagination";
 import type { Route } from "./+types/trips-page";
 
@@ -34,6 +35,8 @@ export default function TripsPage({ loaderData }: Route.ComponentProps) {
   const total = loaderData?.total ?? 0;
   const currentPage = loaderData?.currentPage ?? 1;
   const totalPages = Math.ceil(total / LIMIT);
+  const navigation = useNavigation();
+  const isLoading = navigation.state === "loading";
 
   return (
     <div className="min-h-screen bg-light-200">
@@ -73,7 +76,13 @@ export default function TripsPage({ loaderData }: Route.ComponentProps) {
 
       {/* ── Trip grid ── */}
       <main className="wrapper py-12">
-        {trips.length > 0 ? (
+        {isLoading ? (
+          <div className="trip-grid mb-10">
+            {Array.from({ length: LIMIT }).map((_, i) => (
+              <TripCardSkeleton key={i} />
+            ))}
+          </div>
+        ) : trips.length > 0 ? (
           <>
             <div className="trip-grid mb-10">
               {trips.map((trip) => (

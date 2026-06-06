@@ -1,5 +1,6 @@
 import { getAllUsersWithTripCount, getUser } from "lib/appwrite/auth";
-import { Header, StatsCard, TripCard } from "~/components";
+import { Header, StatsCard, TripCard, TripCardSkeleton } from "~/components";
+import { useNavigation } from "react-router";
 import type { Route } from "./+types/dashboard";
 import {
   getTripsByTravelStyle,
@@ -92,6 +93,8 @@ export async function clientLoader() {
 // ─── component ───────────────────────────────────────────────────────────────
 
 const Dashboard = ({ loaderData }: Route.ComponentProps) => {
+  const navigation = useNavigation();
+  const isLoading = navigation.state === "loading";
   const user = loaderData.user as User | null;
   const { dashboardStats, allTrips, userGrowth, tripsByTravelStyle, allUsers } =
     loaderData;
@@ -154,7 +157,9 @@ const Dashboard = ({ loaderData }: Route.ComponentProps) => {
       <section className="container">
         <h1 className="text-xl font-semibold text-dark-100">Trips</h1>
         <div className="trip-grid">
-          {allTrips.map((trip) => {
+          {isLoading
+            ? Array.from({ length: 4 }).map((_, i) => <TripCardSkeleton key={i} />)
+            : allTrips.map((trip) => {
             if (!trip.name || !trip.estimatedPrice || !trip.imageUrls?.[0]) {
               return null;
             }
