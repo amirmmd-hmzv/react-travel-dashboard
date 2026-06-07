@@ -1,19 +1,14 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
-import { getUser } from "lib/appwrite/auth";
+import { createContext, useContext, type ReactNode } from "react";
 
 const UserContext = createContext<Record<string, any> | null>(null);
 
-export function UserProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<Record<string, any> | null>(null);
-
-  useEffect(() => {
-    let active = true;
-    getUser()
-      .then((result) => { if (active && result && typeof result === "object" && "name" in result) setUser(result); })
-      .catch(() => { if (active) setUser(null); });
-    return () => { active = false; };
-  }, []);
-
+export function UserProvider({
+  children,
+  user,
+}: {
+  children: ReactNode;
+  user: Record<string, any> | null;
+}) {
   return <UserContext.Provider value={user}>{children}</UserContext.Provider>;
 }
 

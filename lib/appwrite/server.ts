@@ -1,82 +1,75 @@
+// lib/appwrite/server.ts
+import { Client, Account, Databases } from "node-appwrite";
 import { appwriteConfig } from "./client";
 
-function serverUrl(path: string) {
-  return `${appwriteConfig.endpointUrl}${path}`;
-}
+export function createSessionClient(request: Request) {
+  const client = new Client()
+    .setEndpoint(appwriteConfig.endpointUrl)
+    .setProject(appwriteConfig.projectId);
 
-function defaultHeaders(request: Request) {
   const cookie = request.headers.get("Cookie") || "";
-  return {
-    Cookie: cookie,
-    "X-Appwrite-Project": appwriteConfig.projectId,
-    "Content-Type": "application/json",
-    "X-Appwrite-Response-Format": "1.8.0",
-  };
-}
+  
+  // Try both the standard key and the legacy key Appwrite SDK uses
+  const cookieNames = [
+    `a_session_${appwriteConfig.projectId}`,
+    `a_session_${appwriteConfig.projectId}_legacy`,
+  ];
 
-async function handleResponse(res: Response) {
-  if (!res.ok) {
-    const text = await res.text();
-    let message: string;
-    try {
-      const json = JSON.parse(text);
-      message = json.message || text;
-    } catch {
-      message = text;
+  for (const name of cookieNames) {
+    const match = cookie.match(
+      new RegExp(`(?:^|;\\s*)${name}=([^;]+)`)
+    );
+    if (match?.[1]) {
+      try {
+        client.setSession(decodeURIComponent(match[1]));
+      } catch {
+        client.setSession(match[1]); // already decoded
+      }
+      break;
     }
-    throw new Error(message);
   }
-  return res.json();
+
+  return {
+    account: new Account(client),
+    db: new Databases(client),
+  };
 }
 
 export async function getServerUser(request: Request) {
-  const res = await fetch(serverUrl("/account"), {
-    headers: defaultHeaders(request),
-  });
-  return handleResponse(res);
+  try {
+    const { account } = createSessionClient(request);
+    return await account.get();
+  } catch {
+    return null;
+  }
 }
 
-export async function createServerDocument(
-  request: Request,
-  collectionId: string,
-  data: Record<string, unknown>,
-  permissions?: { read?: string[]; write?: string[] },
-) {
-  const body: Record<string, unknown> = {
-    documentId: "unique()",
-    data,
-  };
-  if (permissions?.read) body["permissions"] = permissions.read;
-  if (permissions?.write) body["permissions"] = permissions.write;
-
-  const res = await fetch(
-    serverUrl(
-      `/databases/${appwriteConfig.databaseId}/collections/${collectionId}/documents`,
-    ),
-    {
-      method: "POST",
-      headers: defaultHeaders(request),
-      body: JSON.stringify(body),
-    },
-  );
-  return handleResponse(res);
-}
 
 export async function listServerDocuments(
   request: Request,
   collectionId: string,
   queries: string[] = [],
 ) {
-  const url = new URL(
-    serverUrl(
-      `/databases/${appwriteConfig.databaseId}/collections/${collectionId}/documents`,
-    ),
+  const { db } = createSessionClient(request);
+  return await db.listDocuments(
+    appwriteConfig.databaseId,
+    collectionId,
+    queries,
   );
-  for (const q of queries) {
-    url.searchParams.append("queries[]", q);
-  }
-  const res = await fetch(url.toString(), {
-    headers: defaultHeaders(request),
-  });
-  return handleResponse(res);
+}
+
+export async function createServerDocument(
+  request: Request,
+  collectionId: string,
+  data: Record<string, unknown>,
+  permissions?: string[],
+) {
+  const { db } = createSessionClient(request);
+  return await db.createDocument(
+    appwriteConfig.databaseId,
+    collectionId,
+    "unique()",
+    data,
+    permissions,
+  );
 }

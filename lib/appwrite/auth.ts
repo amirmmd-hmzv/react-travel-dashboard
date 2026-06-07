@@ -1,3 +1,4 @@
+// auth.ts
 import { ID, Query } from "appwrite";
 import { OAuthProvider, account, db, appwriteConfig } from "../appwrite/client";
 import { redirect } from "react-router";
@@ -83,6 +84,10 @@ export const loginWithGoogle = async () => {
 export const logoutUser = async () => {
   try {
     await account.deleteSession("current");
+    const base = `a_session_${appwriteConfig.projectId}`;
+    const expired = `; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; samesite=lax${location.protocol === "https:" ? "; secure" : ""}`;
+    document.cookie = `${base}=${expired}`;
+    document.cookie = `${base}_legacy=${expired}`;
   } catch (error) {
     console.error("Error during logout:", error);
   }

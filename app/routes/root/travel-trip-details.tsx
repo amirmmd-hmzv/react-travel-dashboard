@@ -1,3 +1,4 @@
+// travel-trip-details.tsx
 import { Link, useNavigate, type MetaFunction } from "react-router";
 import { useEffect, useState } from "react";
 import {
@@ -7,7 +8,11 @@ import {
 } from "lib/appwrite/trips";
 import { hasUserBookedTrip } from "lib/appwrite/bookings";
 import { getPillItems } from "lib/tripDetails";
-import { useUser } from "lib/useCurrentUser";
+import { account } from "lib/appwrite/client";          
+import { getExistingUser } from "lib/appwrite/auth";     
+import { getServerUser, listServerDocuments } from "lib/appwrite/server";
+import { appwriteConfig } from "lib/appwrite/client";   
+import { Query } from "appwrite";                        
 import StarRating from "~/components/StarRating";
 import InfoPill from "~/components/InfoPill";
 import Chip from "~/components/ui/Chip";
@@ -23,25 +28,73 @@ export const meta: MetaFunction = ({ data }) => [
   },
 ];
 
-export async function loader({ params }: Route.LoaderArgs) {
+// ✅ Server loader: fetches trip + tries to get user from cookie
+export async function loader({ params, request }: Route.LoaderArgs) {
   const rawTrip = await getTripById(params.tripId);
+  if (!rawTrip) throw new Response("Not Found", { status: 404 });
 
-  if (!rawTrip) {
-    throw new Response("Not Found", { status: 404 });
-  }
+  const [trip] = mapAppwriteTrips([rawTrip as unknown as AppwriteTripDocument]);
 
-  const [trip] = mapAppwriteTrips([
-    rawTrip as unknown as AppwriteTripDocument,
-  ]);
+  // Try to get user server-side (works after the first load when cookie is set)
+  let currentUser = null;
+  try {
+    const userAccount = await getServerUser(request);
+    if (userAccount?.$id) {
+      const { documents } = await listServerDocuments(
+        request,
+        appwriteConfig.usersCollections,
+        [Query.equal("accountId", userAccount.$id), Query.limit(1)],
+      );
+      currentUser = documents?.[0] ?? null;
+    }
+  } catch {}
 
-  return { trip };
+  return { trip, currentUser };
 }
 
+// ✅ Client loader: runs on first hydration to fill in user when server missed it
+export async function clientLoader({
+  serverLoader,
+}: Route.ClientLoaderArgs) {
+  const serverData = await serverLoader();
+
+  // If server already got the user, no extra work needed
+  if (serverData.currentUser) return serverData;
+
+  // Server missed — fall back to Appwrite client SDK (same pattern as root.tsx)
+  try {
+    const user = await account.get();
+    if (!user?.$id) return serverData;
+
+    // Write session cookie so the NEXT SSR request works
+    try {
+      const session = await account.getSession("current");
+      if (session?.secret) {
+        const cookieName = `a_session_${appwriteConfig.projectId}`;
+        const secure = location.protocol === "https:" ? "; secure" : "";
+        document.cookie = `${cookieName}=${encodeURIComponent(session.secret)}; path=/; max-age=2592000; samesite=lax${secure}`;
+      }
+    } catch {}
+
+    const currentUser = await getExistingUser(user.$id);
+    return { ...serverData, currentUser: currentUser ?? null };
+  } catch {
+    return serverData;
+  }
+}
+
+// ✅ Force clientLoader to run before page renders on first load
+clientLoader.hydrate = true as const;
+
+// ✅ Show nothing (or a skeleton) while clientLoader runs
+export function HydrateFallback() {
+  return null; // replace with <TripDetailSkeleton /> if you have one
+}
 export default function TravelTripDetails({
   loaderData,
 }: Route.ComponentProps) {
-  const { trip } = loaderData;
-  const currentUser = useUser();
+  const { trip,currentUser  } = loaderData;
+  // const currentUser = useUser();
   console.log(currentUser)
 
   const navigate = useNavigate();

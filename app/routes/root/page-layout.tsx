@@ -1,3 +1,4 @@
+// page-layout.tsx
 import { Outlet } from "react-router";
 import { useUser } from "lib/useCurrentUser";
 import SiteHeader from "~/components/SiteHeader";
