@@ -5,7 +5,7 @@ import {
   mapAppwriteTrips,
   type AppwriteTripDocument,
 } from "lib/appwrite/trips";
-import { createBooking, getUserBookings } from "lib/appwrite/bookings";
+import { hasUserBookedTrip } from "lib/appwrite/bookings";
 import { getPillItems } from "lib/tripDetails";
 import { useUser } from "lib/useCurrentUser";
 import StarRating from "~/components/StarRating";
@@ -42,21 +42,19 @@ export default function TravelTripDetails({
 }: Route.ComponentProps) {
   const { trip } = loaderData;
   const currentUser = useUser();
+  console.log(currentUser)
 
   const navigate = useNavigate();
   const [booking, setBooking] = useState(false);
   const [alreadyBooked, setAlreadyBooked] = useState(false);
 
-  // Check if current user has already booked this trip
   useEffect(() => {
     const uid = currentUser?.accountId;
     if (!uid || !trip?.id) return;
 
     let cancelled = false;
-    getUserBookings(uid).then((bookings) => {
-      if (cancelled) return;
-      const hasBooked = bookings.some((b) => b.tripId === trip.id);
-      setAlreadyBooked(hasBooked);
+    hasUserBookedTrip(uid, trip.id).then((booked) => {
+      if (!cancelled) setAlreadyBooked(booked);
     }).catch(() => {});
     return () => { cancelled = true; };
   }, [currentUser?.accountId, trip?.id]);
@@ -76,12 +74,22 @@ export default function TravelTripDetails({
 
   async function handleBooking() {
     const uid = currentUser?.accountId;
+
     if (!uid) return;
     setBooking(true);
     try {
-      const sessionId = `cs_fake_${crypto.randomUUID()}`;
-      await createBooking(uid, trip, sessionId);
-      navigate(`/payment/success?sessionId=${sessionId}&tripId=${trip.id}`);
+      const res = await fetch("/api/create-booking", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: uid, tripId: trip.id }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+      if (data.alreadyBooked) {
+        setAlreadyBooked(true);
+      } else {
+        navigate(`/payment/success?sessionId=${data.sessionId}&tripId=${trip.id}`);
+      }
     } catch {
       setBooking(false);
     }

@@ -8,6 +8,7 @@ import {
 export default [
   route("sign-in", "routes/root/sign-in.tsx"),
   route("api/create-trip", "routes/api/create-trip.ts"),
+  route("api/create-booking", "routes/api/create-booking.ts"),
   layout("routes/admin/admin-layout.tsx", [
     route("admin/dashboard", "routes/admin/dashboard.tsx"),
     route("admin/all-users", "routes/admin/all-users.tsx"),

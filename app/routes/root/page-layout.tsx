@@ -1,5 +1,5 @@
 import { Outlet } from "react-router";
-import { UserProvider, useUser } from "lib/useCurrentUser";
+import { useUser } from "lib/useCurrentUser";
 import SiteHeader from "~/components/SiteHeader";
 import SiteFooter from "~/components/SiteFooter";
 
@@ -18,11 +18,7 @@ function PageShell() {
 }
 
 const PageLayout = () => {
-  return (
-    <UserProvider>
-      <PageShell />
-    </UserProvider>
-  );
+  return <PageShell />;
 };
 
 export default PageLayout;

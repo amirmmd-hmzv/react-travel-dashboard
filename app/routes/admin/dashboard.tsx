@@ -1,4 +1,5 @@
-import { getAllUsersWithTripCount, getUser } from "lib/appwrite/auth";
+import { getAllUsersWithTripCount } from "lib/appwrite/auth";
+import { useUser } from "lib/useCurrentUser";
 import { Header, StatsCard, TripCard, TripCardSkeleton } from "~/components";
 import { useNavigation } from "react-router";
 import type { Route } from "./+types/dashboard";
@@ -51,37 +52,33 @@ const tripTrendsChartConfig = {
   },
 } satisfies ChartConfig;
 
-// ─── loader ──────────────────────────────────────────────────────────────────
+// ─── loaders ─────────────────────────────────────────────────────────────────
 
-export async function clientLoader() {
+export async function loader() {
   const [
-    user,
     dashboardStats,
     trips,
     userGrowth,
     tripsByTravelStyle,
     allUsers,
   ] = await Promise.all([
-    getUser(),
     getUsersAndTripsStats(),
     getAllTrips(4, 0),
     getUserGrowthPerDay(),
     getTripsByTravelStyle(),
-    getAllUsersWithTripCount(4, 0), 
+    getAllUsersWithTripCount(4, 0),
   ]);
 
   const allTrips = mapAppwriteTrips(trips.allTrips);
 
-  // ✅ Map users - trip count is already included from getAllUsersWithTripCount
-  const mappedUsers: UsersItineraryCount[] =
+  const mappedUsers =
     allUsers?.users.map((user: any) => ({
       imageUrl: user.imageUrl,
       name: user.name,
-      count: user.tripCount, // ✅ Already fetched, no additional request needed
+      count: user.tripCount,
     })) || [];
 
   return {
-    user,
     dashboardStats,
     allTrips,
     userGrowth,
@@ -90,12 +87,15 @@ export async function clientLoader() {
   };
 }
 
+
+
 // ─── component ───────────────────────────────────────────────────────────────
 
 const Dashboard = ({ loaderData }: Route.ComponentProps) => {
   const navigation = useNavigation();
+  const currentUser = useUser();
   const isLoading = navigation.state === "loading";
-  const user = loaderData.user as User | null;
+  const user = currentUser as { name?: string } | null;
   const { dashboardStats, allTrips, userGrowth, tripsByTravelStyle, allUsers } =
     loaderData;
 

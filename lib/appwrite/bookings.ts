@@ -72,3 +72,16 @@ export async function getUserBookings(userId: string) {
 
   return documents as unknown as Booking[];
 }
+
+export async function hasUserBookedTrip(accountId: string, tripId: string) {
+  const { documents } = await db.listDocuments(
+    BOOKINGS().databaseId,
+    BOOKINGS().collectionId,
+    [
+      Query.equal("userId", accountId),
+      Query.equal("tripId", tripId),
+      Query.limit(1),
+    ],
+  );
+  return documents.length > 0;
+}

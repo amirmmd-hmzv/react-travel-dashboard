@@ -8,6 +8,7 @@ import { Button } from "~/components/ui/button";
 import { LuLoader } from "react-icons/lu";
 import { HiSparkles } from "react-icons/hi";
 import { useNavigate } from "react-router";
+import { account } from "lib/appwrite/client";
 
 interface CountryOption {
   value: string;
@@ -101,6 +102,14 @@ const CreateTrip = () => {
       setLoading(false);
       return;
     }
+
+      const user = await account.get();
+       if(!user.$id) {
+           console.error('User not authenticated');
+           setLoading(false)
+           return;
+       }
+
     try {
       const response = await fetch("/api/create-trip", {
         method: "POST",
@@ -112,11 +121,11 @@ const CreateTrip = () => {
           interests: formData.interest,
           budget: formData.budget,
           groupType: formData.groupType,
+          userId: user.$id
         }),
       });
 
       const result: CreateTripResponse = await response.json();
-
       if (result?.id) navigate(`/admin/trips/${result.id}`);
       setError(null);
     } catch (error) {

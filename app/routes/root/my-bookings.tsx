@@ -1,44 +1,29 @@
-import { Link, type MetaFunction } from "react-router";
-import { useEffect, useState } from "react";
+import { Link, useNavigation, type MetaFunction } from "react-router";
 import { getUser } from "lib/appwrite/auth";
 import { getUserBookings, type Booking } from "lib/appwrite/bookings";
 import { TripCardSkeleton } from "~/components";
+import type { Route } from "./+types/my-bookings";
 
 export const meta: MetaFunction = () => [
   { title: "My Bookings — Teal Horizon" },
 ];
 
-export default function MyBookings() {
-  const [state, setState] = useState<{
-    loading: boolean;
-    bookings: Booking[];
-  }>({ loading: true, bookings: [] });
+export async function clientLoader() {
+  const result = await getUser();
+  const user =
+    result && !(result instanceof Response) && "accountId" in result
+      ? (result as unknown as { accountId: string })
+      : null;
+  if (!user) return { bookings: [] };
 
-  useEffect(() => {
-    let cancelled = false;
+  const bookings = await getUserBookings(user.accountId);
+  return { bookings };
+}
 
-    async function load() {
-      try {
-        const user = await getUser();
-        if (cancelled) return;
-
-        if (!user || user instanceof Response || !user.accountId) {
-          setState({ loading: false, bookings: [] });
-          return;
-        }
-
-        const bookings = await getUserBookings(user.accountId);
-        if (!cancelled) setState({ loading: false, bookings });
-      } catch {
-        if (!cancelled) setState({ loading: false, bookings: [] });
-      }
-    }
-
-    load();
-    return () => { cancelled = true; };
-  }, []);
-
-  const { loading, bookings } = state;
+export default function MyBookings({ loaderData }: Route.ComponentProps) {
+  const { bookings } = loaderData;
+  const navigation = useNavigation();
+  const loading = navigation.state === "loading";
 
   return (
     <div className="wrapper py-10">

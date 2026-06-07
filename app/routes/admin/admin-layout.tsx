@@ -1,7 +1,17 @@
 import { getExistingUser, storeUserData } from "lib/appwrite/auth";
 import { account } from "lib/appwrite/client";
-import { Outlet, redirect } from "react-router";
+import { getServerUser } from "lib/appwrite/server";
+import { Outlet, redirect, type LoaderFunctionArgs } from "react-router";
 import { MobileSidebar, NavItems } from "~/components";
+
+export async function loader({ request }: LoaderFunctionArgs) {
+  try {
+    await getServerUser(request);
+    return {};
+  } catch {
+    return redirect("/sign-in");
+  }
+}
 
 export async function clientLoader() {
   try {

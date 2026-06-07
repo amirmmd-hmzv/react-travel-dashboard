@@ -1,7 +1,7 @@
 import { type ActionFunctionArgs, data } from "react-router";
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { Client, Account, Databases, ID } from "appwrite";
 import { appwriteConfig } from "lib/appwrite/client";
+import { createServerDocument } from "lib/appwrite/server";
 import { parseMarkdownToJson } from "lib/utils";
 
 interface ActionBody {
@@ -11,43 +11,30 @@ interface ActionBody {
   interests?: string;
   budget?: string;
   groupType?: string;
+  userId :any
 }
 
-const createServerSession = (request: Request) => {
-  const cookie = request.headers.get("Cookie") || "";
-  const client = new Client()
-    .setEndpoint(appwriteConfig.endpointUrl)
-    .setProject(appwriteConfig.projectId);
-  client.headers["Cookie"] = cookie;
-  return {
-    account: new Account(client),
-    db: new Databases(client),
-  };
-};
-
 export const action = async ({ request }: ActionFunctionArgs) => {
-  const { account, db } = createServerSession(request);
-
-  let currentUser;
-  try {
-    currentUser = await account.get();
-  } catch {
-    return data({ error: "Authentication required. Please sign in." }, { status: 401 });
-  }
-
-  if (!currentUser?.$id) {
-    return data({ error: "Authentication required. Please sign in." }, { status: 401 });
-  }
-
   const body: ActionBody = await request.json();
-  const { country, numberOfDays, travelStyle, interests, budget, groupType } = body;
+  const { country, numberOfDays, travelStyle, interests, budget, groupType,userId } =
+    body;
 
-  if (!country || !numberOfDays || !travelStyle || !interests || !budget || !groupType) {
+  if (
+    !country ||
+    !numberOfDays ||
+    !travelStyle ||
+    !interests ||
+    !budget ||
+    !groupType
+  ) {
     return data({ error: "All fields are required." }, { status: 400 });
   }
 
   if (numberOfDays < 1 || numberOfDays > 30) {
-    return data({ error: "Duration must be between 1 and 30 days." }, { status: 400 });
+    return data(
+      { error: "Duration must be between 1 and 30 days." },
+      { status: 400 },
+    );
   }
 
   const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY!);
@@ -116,14 +103,13 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       .slice(0, 3)
       .map((result: any) => result.urls?.regular || null);
 
-    const result = await db.createDocument(
-      appwriteConfig.databaseId,
+    const result = await createServerDocument(
+      request,
       appwriteConfig.tripsCollections,
-      ID.unique(),
       {
         tripDetail: JSON.stringify(trip),
         imageUrls,
-        userId: currentUser.$id,
+        userId,
       },
     );
 
