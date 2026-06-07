@@ -1,11 +1,11 @@
 import { Link, useNavigate, type MetaFunction } from "react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   getTripById,
   mapAppwriteTrips,
   type AppwriteTripDocument,
 } from "lib/appwrite/trips";
-import { createBooking } from "lib/appwrite/bookings";
+import { createBooking, getUserBookings } from "lib/appwrite/bookings";
 import { getPillItems } from "lib/tripDetails";
 import { useUser } from "lib/useCurrentUser";
 import StarRating from "~/components/StarRating";
@@ -45,6 +45,21 @@ export default function TravelTripDetails({
 
   const navigate = useNavigate();
   const [booking, setBooking] = useState(false);
+  const [alreadyBooked, setAlreadyBooked] = useState(false);
+
+  // Check if current user has already booked this trip
+  useEffect(() => {
+    const uid = currentUser?.accountId;
+    if (!uid || !trip?.id) return;
+
+    let cancelled = false;
+    getUserBookings(uid).then((bookings) => {
+      if (cancelled) return;
+      const hasBooked = bookings.some((b) => b.tripId === trip.id);
+      setAlreadyBooked(hasBooked);
+    }).catch(() => {});
+    return () => { cancelled = true; };
+  }, [currentUser?.accountId, trip?.id]);
 
   if (!trip) return null;
 
@@ -307,18 +322,31 @@ export default function TravelTripDetails({
               {/* Booking CTA */}
 
               {currentUser ? (
-                <div className="flex flex-col gap-3">
-                  <Button
-                    className="w-full bg-primary-100 hover:bg-primary-500 text-white font-plus-jakarta font-semibold py-3 rounded-lg text-sm transition-colors"
-                    disabled={booking}
-                    onClick={handleBooking}
-                  >
-                    {booking ? "Booking..." : "Book This Trip"}
-                  </Button>
-                  <p className="font-plus-jakarta text-gray-100 text-xs text-center">
-                    🔒 Secure checkout — no real payment processed
-                  </p>
-                </div>
+                alreadyBooked ? (
+                  <div className="flex flex-col gap-3">
+                    <Link to="/my-bookings">
+                      <Button className="w-full bg-success-50 hover:bg-success-100 text-success-700 border border-success-200 font-plus-jakarta font-semibold py-3 rounded-lg text-sm transition-colors">
+                        ✓ Already Booked — View Bookings
+                      </Button>
+                    </Link>
+                    <p className="font-plus-jakarta text-gray-100 text-xs text-center">
+                      This trip is already in your bookings.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="flex flex-col gap-3">
+                    <Button
+                      className="w-full bg-primary-100 hover:bg-primary-500 text-white font-plus-jakarta font-semibold py-3 rounded-lg text-sm transition-colors"
+                      disabled={booking}
+                      onClick={handleBooking}
+                    >
+                      {booking ? "Booking..." : "Book This Trip"}
+                    </Button>
+                    <p className="font-plus-jakarta text-gray-100 text-xs text-center">
+                      🔒 Secure checkout — no real payment processed
+                    </p>
+                  </div>
+                )
               ) : (
                 <div className="flex flex-col gap-3">
                   <Link to="/sign-in">

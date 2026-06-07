@@ -23,6 +23,21 @@ export async function createBooking(
   trip: { id: string; name: string; imageUrls: string[]; location: any; estimatedPrice: string },
   sessionId: string,
 ) {
+  // Guard against duplicate bookings: if the user already booked this trip, return the existing one
+  const { documents: existing } = await db.listDocuments(
+    BOOKINGS().databaseId,
+    BOOKINGS().collectionId,
+    [
+      Query.equal("userId", userId),
+      Query.equal("tripId", trip.id),
+      Query.limit(1),
+    ],
+  );
+
+  if (existing.length > 0) {
+    return existing[0] as unknown as Booking;
+  }
+
   const tripLocation =
     typeof trip.location === "string"
       ? trip.location
