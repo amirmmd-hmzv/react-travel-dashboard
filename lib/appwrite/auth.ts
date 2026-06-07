@@ -121,7 +121,7 @@ export const getAllUsers = async (limit: number, offset: number) => {
 
     return { users, total };
   } catch (e) {
-    console.log("Error fetching users", e);
+    console.error("Error fetching users", e);
     return { users: [], total: 0 };
   }
 };
@@ -176,7 +176,7 @@ export const getAllUsersWithTripCount = async (
 
     return { users: usersWithCounts, total };
   } catch (e) {
-    console.log("Error fetching users with trip count", e);
+    console.error("Error fetching users with trip count", e);
     return { users: [], total: 0 };
   }
 };
@@ -195,10 +195,8 @@ export const cleanupDuplicateUsers = async () => {
     grouped[id].push(doc);
   }
 
-  // Delete duplicates, keep the first one
   for (const [accountId, docs] of Object.entries(grouped)) {
     if (docs.length > 1) {
-      console.log(`Found ${docs.length} duplicates for ${accountId}`);
       const [keep, ...duplicates] = docs;
       for (const doc of duplicates) {
         await db.deleteDocument(
@@ -206,10 +204,7 @@ export const cleanupDuplicateUsers = async () => {
           appwriteConfig.usersCollections,
           doc.$id,
         );
-        console.log("Deleted:", doc.$id);
       }
     }
   }
-
-  console.log("Cleanup done!");
 };

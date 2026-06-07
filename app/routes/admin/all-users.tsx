@@ -11,11 +11,6 @@ export async function loader() {
 }
 
 const AllUsers = ({ loaderData }: Route.ComponentProps) => {
-  console.log(loaderData);
-
-  const user = {
-    name: " Amir",
-  };
 
   return (
     <main className="dashboard wrapper ">

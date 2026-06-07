@@ -11,12 +11,12 @@ const TripDetailNav = () => {
           <img src="/assets/icons/arrow-left.svg" alt="" className="h-4 w-4" />
           All Trips
         </Link>
-        <Link to="/" className="flex items-center gap-2">
+        {/* <Link to="/" className="flex items-center gap-2">
           <img src="/assets/icons/logo.svg" alt="Teal Horizon" className="h-7 w-7" />
           <span className="font-clash-display text-dark-100 font-semibold hidden sm:block">
             Teal Horizon
           </span>
-        </Link>
+        </Link> */}
         <div className="w-20" />
       </div>
     </nav>

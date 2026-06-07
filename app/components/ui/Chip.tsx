@@ -1,5 +1,3 @@
-// components/ui/Chip.tsx
-
 import type { IconType } from "react-icons";
 import { LuX } from "react-icons/lu";
 

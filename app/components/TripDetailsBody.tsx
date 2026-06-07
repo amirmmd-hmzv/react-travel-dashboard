@@ -1,7 +1,7 @@
 import { cn } from "lib/utils";
 import { getPillItems } from "lib/tripDetails";
 import { InfoPill, StarRating } from "~/components";
-import Chip from "~/components/ui/Cheap";
+import Chip from "~/components/ui/Chip";
 
 interface TripDetailsBodyProps {
   tripData: Trip;

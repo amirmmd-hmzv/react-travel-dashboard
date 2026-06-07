@@ -1,53 +1,22 @@
 import { Header } from "~/components";
 import { Combobox } from "~/components/ui/combobox";
-import type { Route } from "./+types/create-trip";
 import { useEffect, useMemo, useState } from "react";
 import { comboBoxItems, selectItems } from "~/constants";
 import { formatKey } from "lib/utils";
 import { WorldMap } from "~/components/WorldMap";
 import { Button } from "~/components/ui/button";
-import { LuLoader, LuSparkle } from "react-icons/lu";
+import { LuLoader } from "react-icons/lu";
 import { HiSparkles } from "react-icons/hi";
-import { account } from "lib/appwrite/client";
 import { useNavigate } from "react-router";
 
-export interface CountryOption {
+interface CountryOption {
   value: string;
   label: string;
   imgIcon: string;
   cca3: string;
 }
 
-// export async function loader() {
-//   try {
-//     const res = await fetch(
-//       "https://restcountries.com/v3.1/all?fields=name,flags,latlng,maps,cca3"
-//     );
-
-//     if (!res.ok) {
-//       throw new Error("Failed to fetch countries");
-//     }
-
-//     const data = await res.json();
-
-//     return data
-//       .map((country: any) => ({
-//         name: country.name.common,
-//         cca3: country.cca3,
-//         flag: country.flags.svg,
-//         value: country.name.common,
-//         coordinates: country.latlng, // 👈 اصلاح شد
-//         maps: country.maps.openStreetMaps,
-//       }))
-//       .sort((a: any, b: any) => a.name.localeCompare(b.name));
-//   } catch (err) {
-//     console.error("Loader error:", err);
-//     console.log(err)
-//     return []; // 👈 نذار route بترکه
-//   }
-// }
-
-const CreateTrip = ({ loaderData }: Route.ComponentProps) => {
+const CreateTrip = () => {
   const [countries, setCountries] = useState<Country[]>([]);
   const [loadingCountries, setLoadingCountries] = useState(true);
   const navigate = useNavigate();
@@ -132,14 +101,6 @@ const CreateTrip = ({ loaderData }: Route.ComponentProps) => {
       setLoading(false);
       return;
     }
-    const user = await account.get();
-
-    if (!user.$id) {
-      setError("You must be logged in to create a trip");
-      setLoading(false);
-      return;
-    }
-
     try {
       const response = await fetch("/api/create-trip", {
         method: "POST",
@@ -151,17 +112,15 @@ const CreateTrip = ({ loaderData }: Route.ComponentProps) => {
           interests: formData.interest,
           budget: formData.budget,
           groupType: formData.groupType,
-          userId: user.$id,
         }),
       });
 
       const result: CreateTripResponse = await response.json();
 
       if (result?.id) navigate(`/admin/trips/${result.id}`);
-      else console.error("Failed to generate a trip");
       setError(null);
     } catch (error) {
-      console.log("Error creating trip:", error);
+      console.error("Error creating trip:", error);
     } finally {
       setLoading(false);
     }

@@ -9,7 +9,6 @@ interface SiteHeaderProps {
 
 const SiteHeader = ({ currentUser }: SiteHeaderProps) => {
 
-  console.log(currentUser)
   const [logoutOpen, setLogoutOpen] = useState(false);
 
   return (

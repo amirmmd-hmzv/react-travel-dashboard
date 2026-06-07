@@ -1,21 +1,54 @@
 import { type ActionFunctionArgs, data } from "react-router";
 import { GoogleGenerativeAI } from "@google/generative-ai";
-// import { parseMarkdownToJson, parseTripData } from "~/lib/utils";
-import {appwriteConfig, db} from "../../../lib/appwrite/client";
-import { ID } from "appwrite";
-import { parseMarkdownToJson, parseTripData } from "lib/utils";
-// import { createProduct } from "~/lib/stripe";
+import { Client, Account, Databases, ID } from "appwrite";
+import { appwriteConfig } from "lib/appwrite/client";
+import { parseMarkdownToJson } from "lib/utils";
+
+interface ActionBody {
+  country?: string;
+  numberOfDays?: number;
+  travelStyle?: string;
+  interests?: string;
+  budget?: string;
+  groupType?: string;
+}
+
+const createServerSession = (request: Request) => {
+  const cookie = request.headers.get("Cookie") || "";
+  const client = new Client()
+    .setEndpoint(appwriteConfig.endpointUrl)
+    .setProject(appwriteConfig.projectId);
+  client.headers["Cookie"] = cookie;
+  return {
+    account: new Account(client),
+    db: new Databases(client),
+  };
+};
 
 export const action = async ({ request }: ActionFunctionArgs) => {
-  const {
-    country,
-    numberOfDays,
-    travelStyle,
-    interests,
-    budget,
-    groupType,
-    userId,
-  } = await request.json();
+  const { account, db } = createServerSession(request);
+
+  let currentUser;
+  try {
+    currentUser = await account.get();
+  } catch {
+    return data({ error: "Authentication required. Please sign in." }, { status: 401 });
+  }
+
+  if (!currentUser?.$id) {
+    return data({ error: "Authentication required. Please sign in." }, { status: 401 });
+  }
+
+  const body: ActionBody = await request.json();
+  const { country, numberOfDays, travelStyle, interests, budget, groupType } = body;
+
+  if (!country || !numberOfDays || !travelStyle || !interests || !budget || !groupType) {
+    return data({ error: "All fields are required." }, { status: 400 });
+  }
+
+  if (numberOfDays < 1 || numberOfDays > 30) {
+    return data({ error: "Duration must be between 1 and 30 days." }, { status: 400 });
+  }
 
   const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY!);
   const unsplashApiKey = process.env.UNSPLASH_ACCESS_KEY!;
@@ -69,9 +102,9 @@ export const action = async ({ request }: ActionFunctionArgs) => {
         ]
     }`;
 
-  const textResult = await genAI
-  .getGenerativeModel({ model: "gemini-2.5-flash" })
-  .generateContent([prompt]);
+    const textResult = await genAI
+      .getGenerativeModel({ model: "gemini-2.5-flash" })
+      .generateContent([prompt]);
 
     const trip = parseMarkdownToJson(textResult.response.text());
 
@@ -89,30 +122,10 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       ID.unique(),
       {
         tripDetail: JSON.stringify(trip),
-        // createdAt: new Date().toISOString(),
         imageUrls,
-        userId,
+        userId: currentUser.$id,
       },
     );
-
-    // const tripDetail = parseTripData(result.tripDetails) as Trip;
-    // const tripPrice = parseInt(tripDetail.estimatedPrice.replace("$", ""), 10);
-    // const paymentLink = await createProduct(
-    //   tripDetail.name,
-    //   tripDetail.description,
-    //   imageUrls,
-    //   tripPrice,
-    //   result.$id,
-    // );
-
-    // await db.updateDocument(
-    //   appwriteConfig.databaseId,
-    //   appwriteConfig.tripsCollections,
-    //   result.$id,
-    //   {
-    //     payment_link: paymentLink.url,
-    //   },
-    // );
 
     return data({ id: result.$id });
   } catch (e) {

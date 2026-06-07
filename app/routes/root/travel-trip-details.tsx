@@ -10,7 +10,7 @@ import { getPillItems } from "lib/tripDetails";
 import { useUser } from "lib/useCurrentUser";
 import StarRating from "~/components/StarRating";
 import InfoPill from "~/components/InfoPill";
-import Chip from "~/components/ui/Cheap";
+import Chip from "~/components/ui/Chip";
 import { Button } from "~/components/ui/button";
 import TripDetailNav from "~/components/TripDetailNav";
 import type { Route } from "./+types/travel-trip-details";

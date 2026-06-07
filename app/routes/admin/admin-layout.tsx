@@ -20,7 +20,7 @@ export async function clientLoader() {
 
 
   } catch (e) {
-    console.log("Error client loader", e);
+    console.error("Error client loader", e);
     return redirect("/sign-in");
   }
 }
