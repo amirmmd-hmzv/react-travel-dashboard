@@ -1,5 +1,5 @@
 // lib/appwrite/server.ts
-import { Client, Account, Databases } from "node-appwrite";
+import { Client, Account, Databases, Query } from "node-appwrite";
 import { appwriteConfig } from "./client";
 
 export function createSessionClient(request: Request) {
@@ -56,6 +56,24 @@ export async function listServerDocuments(
     collectionId,
     queries,
   );
+}
+
+export async function checkServerBooking(
+  request: Request,
+  accountId: string,
+  tripId: string,
+) {
+  try {
+    const { db } = createSessionClient(request);
+    const { documents } = await db.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.bookingsCollections,
+      [Query.equal("userId", accountId), Query.equal("tripId", tripId), Query.limit(1)],
+    );
+    return documents.length > 0;
+  } catch {
+    return false;
+  }
 }
 
 export async function createServerDocument(

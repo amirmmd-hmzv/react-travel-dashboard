@@ -1,6 +1,6 @@
 // travel-trip-details.tsx
 import { Link, useNavigate, type MetaFunction } from "react-router";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   getTripById,
   mapAppwriteTrips,
@@ -10,7 +10,7 @@ import { hasUserBookedTrip } from "lib/appwrite/bookings";
 import { getPillItems } from "lib/tripDetails";
 import { account } from "lib/appwrite/client";          
 import { getExistingUser } from "lib/appwrite/auth";     
-import { getServerUser, listServerDocuments } from "lib/appwrite/server";
+import { getServerUser, listServerDocuments, checkServerBooking } from "lib/appwrite/server";
 import { appwriteConfig } from "lib/appwrite/client";   
 import { Query } from "appwrite";                        
 import StarRating from "~/components/StarRating";
@@ -49,7 +49,11 @@ export async function loader({ params, request }: Route.LoaderArgs) {
     }
   } catch {}
 
-  return { trip, currentUser };
+  const alreadyBooked = currentUser
+    ? await checkServerBooking(request, currentUser.accountId, params.tripId)
+    : false;
+
+  return { trip, currentUser, alreadyBooked };
 }
 
 // ✅ Client loader: runs on first hydration to fill in user when server missed it
@@ -77,7 +81,10 @@ export async function clientLoader({
     } catch {}
 
     const currentUser = await getExistingUser(user.$id);
-    return { ...serverData, currentUser: currentUser ?? null };
+    const alreadyBooked = currentUser
+      ? await hasUserBookedTrip(currentUser.accountId, serverData.trip?.id)
+      : false;
+    return { ...serverData, currentUser: currentUser ?? null, alreadyBooked };
   } catch {
     return serverData;
   }
@@ -93,24 +100,11 @@ export function HydrateFallback() {
 export default function TravelTripDetails({
   loaderData,
 }: Route.ComponentProps) {
-  const { trip,currentUser  } = loaderData;
-  // const currentUser = useUser();
-  console.log(currentUser)
+  const { trip, currentUser } = loaderData;
+  const [alreadyBooked, setAlreadyBooked] = useState(loaderData.alreadyBooked);
 
   const navigate = useNavigate();
   const [booking, setBooking] = useState(false);
-  const [alreadyBooked, setAlreadyBooked] = useState(false);
-
-  useEffect(() => {
-    const uid = currentUser?.accountId;
-    if (!uid || !trip?.id) return;
-
-    let cancelled = false;
-    hasUserBookedTrip(uid, trip.id).then((booked) => {
-      if (!cancelled) setAlreadyBooked(booked);
-    }).catch(() => {});
-    return () => { cancelled = true; };
-  }, [currentUser?.accountId, trip?.id]);
 
   if (!trip) return null;
 
