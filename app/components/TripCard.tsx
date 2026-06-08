@@ -1,6 +1,6 @@
 import { LuMap } from "react-icons/lu";
 import { Link, useLocation } from "react-router";
-import Chip from "./ui/Chip";
+import Chip from "./ui/chip";
 import { getFirstWord } from "lib/utils";
 
 const TripCard = ({

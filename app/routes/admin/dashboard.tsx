@@ -1,5 +1,5 @@
 import { getAllUsersWithTripCount } from "lib/appwrite/auth";
-import { useUser } from "lib/useCurrentUser";
+import { useUser } from "~/hooks/useCurrentUser";
 import { Header, StatsCard, TripCard, TripCardSkeleton } from "~/components";
 import { useNavigation } from "react-router";
 import type { Route } from "./+types/dashboard";

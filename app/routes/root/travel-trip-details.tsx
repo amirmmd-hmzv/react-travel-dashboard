@@ -15,7 +15,7 @@ import { appwriteConfig } from "lib/appwrite/client";
 import { Query } from "appwrite";                        
 import StarRating from "~/components/StarRating";
 import InfoPill from "~/components/InfoPill";
-import Chip from "~/components/ui/Chip";
+import Chip from "~/components/ui/chip";
 import { Button } from "~/components/ui/button";
 import TripDetailNav from "~/components/TripDetailNav";
 import type { Route } from "./+types/travel-trip-details";

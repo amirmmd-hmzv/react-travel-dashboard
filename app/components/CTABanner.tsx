@@ -1,6 +1,6 @@
 import { Link } from "react-router";
 import { Button } from "~/components/ui/button";
-import { useUser } from "lib/useCurrentUser";
+import { useUser } from "~/hooks/useCurrentUser";
 
 const CTABanner = () => {
   const currentUser = useUser();

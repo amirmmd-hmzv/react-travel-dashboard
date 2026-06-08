@@ -11,7 +11,7 @@ import {
   type ClientLoaderFunctionArgs,
 } from "react-router";
 import { Query } from "appwrite";
-import { UserProvider } from "lib/useCurrentUser";
+import { UserProvider } from "~/hooks/useCurrentUser";
 import { getServerUser, listServerDocuments } from "lib/appwrite/server";
 import { appwriteConfig, account } from "lib/appwrite/client";
 import { getExistingUser } from "lib/appwrite/auth";

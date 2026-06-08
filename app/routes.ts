@@ -24,6 +24,6 @@ export default [
     route("*", "routes/root/not-found.tsx"),
   ]),
   route("payment/success", "routes/payment/success.tsx"),
-  route("/sentry-example-page", "routes/sentry-example-page.tsx"),
-  route("/api/sentry-example-api", "routes/api.sentry-example-api.ts"),
+  route("/sentry-example-page", "routes/sentry/example-page.tsx"),
+  route("/api/sentry-example-api", "routes/sentry/api/example-api.ts"),
 ] satisfies RouteConfig;
