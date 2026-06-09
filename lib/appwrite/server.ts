@@ -23,18 +23,28 @@ export function createSessionClient(request: Request) {
     `a_session_${appwriteConfig.projectId}_legacy`,
   ];
 
+  let sessionSecret: string | null = null;
+
   for (const name of cookieNames) {
     const match = cookie.match(
       new RegExp(`(?:^|;\\s*)${name}=([^;]+)`)
     );
     if (match?.[1]) {
       try {
-        client.setSession(decodeURIComponent(match[1]));
+        sessionSecret = decodeURIComponent(match[1]);
       } catch {
-        client.setSession(match[1]);
+        sessionSecret = match[1];
       }
       break;
     }
+  }
+
+  if (!sessionSecret) {
+    sessionSecret = request.headers.get("X-Appwrite-Session");
+  }
+
+  if (sessionSecret) {
+    client.setSession(sessionSecret);
   }
 
   return {
@@ -47,7 +57,7 @@ export function createAdminClient() {
   const client = new Client()
     .setEndpoint(appwriteConfig.endpointUrl)
     .setProject(appwriteConfig.projectId)
-    .setKey(import.meta.env.VITE_APPWRITE_API_KEY!);
+    .setKey(import.meta.env.APPWRITE_API_KEY!);
   return {
     db: new Databases(client),
   };
@@ -116,7 +126,7 @@ export async function getServerUserDocument(
     const userAccount = await getServerUser(request);
     if (!userAccount?.$id) return null;
 
-    const { db } = createSessionClient(request);
+    const { db } = createAdminClient();
     const { documents } = await db.listDocuments(
       appwriteConfig.databaseId,
       appwriteConfig.usersCollections,
@@ -133,6 +143,7 @@ export async function requireAdminUser(
   request: Request,
 ): Promise<ServerUserDocument | null> {
   const userDoc = await getServerUserDocument(request);
+  console.log("userdoc",userDoc)
   if (!userDoc || userDoc.status !== "admin") return null;
   return userDoc;
 }

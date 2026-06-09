@@ -12,9 +12,8 @@ import {
 } from "react-router";
 import { UserProvider } from "~/hooks/useCurrentUser";
 import { getServerUserDocument } from "lib/appwrite/server";
-import { syncSessionToCookie } from "lib/appwrite/session-cookie";
-import { appwriteConfig, account } from "lib/appwrite/client";
-import { getExistingUser } from "lib/appwrite/auth";
+import { appwriteConfig } from "lib/appwrite/client";
+import { getClientUser } from "lib/client-user";
 import { Toaster } from "~/components/ui/sonner";
 import type { Route } from "./+types/root";
 import "./app.css";
@@ -29,21 +28,11 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export async function clientLoader({ serverLoader }: ClientLoaderFunctionArgs) {
-  try {
-    const serverData = await serverLoader<Awaited<ReturnType<typeof loader>>>();
-    if (serverData?.currentUser) return serverData;
+  const serverData = await serverLoader<Awaited<ReturnType<typeof loader>>>();
+  if (serverData?.currentUser) return serverData;
 
-    // Server missed — try client SDK
-    const user = await account.get();
-    if (!user?.$id) return { currentUser: null };
-
-    await syncSessionToCookie();
-
-    const existingUser = await getExistingUser(user.$id);
-    return { currentUser: existingUser ?? null };
-  } catch {
-    return { currentUser: null };
-  }
+  const currentUser = await getClientUser();
+  return { currentUser };
 }
 
 // ⬇️ CRITICAL: This forces the clientLoader to run BEFORE the page renders on hydration.

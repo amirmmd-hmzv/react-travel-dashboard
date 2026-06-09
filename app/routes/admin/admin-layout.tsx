@@ -1,7 +1,6 @@
-import { getExistingUser, storeUserData } from "lib/appwrite/auth";
-import { account } from "lib/appwrite/client";
+import { storeUserData } from "lib/appwrite/auth";
 import { getServerUserDocument } from "lib/appwrite/server";
-import { syncSessionToCookie } from "lib/appwrite/session-cookie";
+import { getClientUser } from "lib/client-user";
 import {
   Outlet,
   redirect,
@@ -10,48 +9,28 @@ import {
 } from "react-router";
 import { MobileSidebar, NavItems } from "~/components";
 
-export async function loader({ request }: LoaderFunctionArgs) {
-  const userDoc = await getServerUserDocument(request);
 
-  if (!userDoc) throw redirect("/sign-in");
-  if (userDoc.status !== "admin") throw redirect("/");
 
-  return { user: userDoc };
-}
-
-export async function clientLoader({
-  serverLoader,
-}: ClientLoaderFunctionArgs) {
+export async function clientLoader() {
   try {
-    const serverData = await serverLoader<Awaited<ReturnType<typeof loader>>>();
-    if (serverData?.user) return serverData;
+    let user = await getClientUser();
+
+    if (!user) {
+      const newUser = await storeUserData();
+      if (newUser instanceof Response) throw redirect("/sign-in");
+      user = newUser;
+    }
+
+    if (!user) throw redirect("/sign-in");
+    if (user.status !== "admin") throw redirect("/");
+
+    return { user };
   } catch (e) {
     if (e instanceof Response) throw e;
-  }
-
-  try {
-    await syncSessionToCookie();
-
-    const user = await account.get();
-    if (!user?.$id) throw redirect("/sign-in");
-
-    const existingUser = await getExistingUser(user.$id);
-
-    if (existingUser?.status === "user") throw redirect("/");
-
-    if (existingUser?.$id) return { user: existingUser };
-
-    const newUser = await storeUserData();
-    if (newUser instanceof Response) throw newUser;
-    if (newUser?.status !== "admin") throw redirect("/");
-
-    return { user: newUser ?? null };
-  } catch (e) {
-    if (e instanceof Response) throw e;
-    console.error("Error client loader", e);
     throw redirect("/sign-in");
   }
 }
+
 
 clientLoader.hydrate = true as const;
 

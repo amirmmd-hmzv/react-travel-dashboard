@@ -9,10 +9,9 @@ import {
 } from "lib/appwrite/trips";
 import { hasUserBookedTrip } from "lib/appwrite/bookings";
 import { getPillItems } from "lib/tripDetails";
-import { account, appwriteConfig } from "lib/appwrite/client";
-import { getExistingUser } from "lib/appwrite/auth";
+import { appwriteConfig } from "lib/appwrite/client";
 import { getServerUser, listServerDocuments, checkServerBooking } from "lib/appwrite/server";
-import { syncSessionToCookie } from "lib/appwrite/session-cookie";
+import { getClientUser } from "lib/client-user";
 import { Query } from "appwrite";                        
 import InfoPill from "~/components/trip/InfoPill";
 import { TripPills, StarRating } from "~/components";
@@ -58,30 +57,18 @@ export async function loader({ params, request }: Route.LoaderArgs) {
   return { trip, currentUser, alreadyBooked };
 }
 
-// ✅ Client loader: runs on first hydration to fill in user when server missed it
 export async function clientLoader({
   serverLoader,
 }: Route.ClientLoaderArgs) {
   const serverData = await serverLoader();
 
-  // If server already got the user, no extra work needed
   if (serverData.currentUser) return serverData;
 
-  // Server missed — fall back to Appwrite client SDK (same pattern as root.tsx)
-  try {
-    const user = await account.get();
-    if (!user?.$id) return serverData;
-
-    await syncSessionToCookie();
-
-    const currentUser = await getExistingUser(user.$id);
-    const alreadyBooked = currentUser
-      ? await hasUserBookedTrip(currentUser.accountId, serverData.trip?.id)
-      : false;
-    return { ...serverData, currentUser: currentUser ?? null, alreadyBooked };
-  } catch {
-    return serverData;
-  }
+  const currentUser = await getClientUser();
+  const alreadyBooked = currentUser
+    ? await hasUserBookedTrip(currentUser.accountId, serverData.trip?.id)
+    : false;
+  return { ...serverData, currentUser: currentUser ?? null, alreadyBooked };
 }
 
 // ✅ Force clientLoader to run before page renders on first load

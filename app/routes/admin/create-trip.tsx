@@ -9,6 +9,7 @@ import { LuLoader } from "react-icons/lu";
 import { HiSparkles } from "react-icons/hi";
 import { useNavigate } from "react-router";
 import { toast } from "sonner";
+import { appwriteConfig } from "lib/appwrite/client";
 import type { Country, TripFormData, CreateTripResponse } from "~/types";
 
 interface CountryOption {
@@ -105,9 +106,17 @@ const CreateTrip = () => {
     }
 
     try {
+      const raw = globalThis.localStorage?.getItem(
+        `a_session_${appwriteConfig.projectId}`,
+      );
+      const session = raw ? JSON.parse(raw).secret : null;
+
       const response = await fetch("/api/create-trip", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...(session ? { "X-Appwrite-Session": session } : {}),
+        },
         credentials: "include",
         body: JSON.stringify({
           country: formData.country,

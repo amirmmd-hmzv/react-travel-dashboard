@@ -15,6 +15,7 @@ interface ActionBody {
 
 export const action = async ({ request }: ActionFunctionArgs) => {
   const adminUser = await requireAdminUser(request);
+  console.log(adminUser)
   if (!adminUser) {
     return data({ error: "Admin access required." }, { status: 403 });
   }
