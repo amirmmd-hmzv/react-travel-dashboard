@@ -2,7 +2,7 @@
 import { Link, useNavigate, type MetaFunction } from "react-router";
 import { useState } from "react";
 import {
-  getTripById,
+  getServerTripById,
   mapAppwriteTrips,
   type AppwriteTripDocument,
 } from "lib/appwrite/trips";
@@ -30,7 +30,7 @@ export const meta: MetaFunction = ({ data }) => [
 
 // ✅ Server loader: fetches trip + tries to get user from cookie
 export async function loader({ params, request }: Route.LoaderArgs) {
-  const rawTrip = await getTripById(params.tripId);
+  const rawTrip = await getServerTripById(params.tripId);
   if (!rawTrip) throw new Response("Not Found", { status: 404 });
 
   const [trip] = mapAppwriteTrips([rawTrip as unknown as AppwriteTripDocument]);
@@ -93,9 +93,30 @@ export async function clientLoader({
 // ✅ Force clientLoader to run before page renders on first load
 clientLoader.hydrate = true as const;
 
-// ✅ Show nothing (or a skeleton) while clientLoader runs
 export function HydrateFallback() {
-  return null; // replace with <TripDetailSkeleton /> if you have one
+  return (
+    <div className="wrapper py-10">
+      <div className="animate-pulse space-y-6">
+        <div className="h-10 w-3/4 bg-gray-200 rounded-lg" />
+        <div className="h-5 w-1/3 bg-gray-200 rounded" />
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-8">
+          <div className="lg:col-span-2 space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <div className="md:col-span-2 md:row-span-2 h-82.5 bg-gray-200 rounded-[20px]" />
+              <div className="h-37.5 bg-gray-200 rounded-[20px]" />
+              <div className="h-37.5 bg-gray-200 rounded-[20px]" />
+            </div>
+            <div className="h-6 w-1/2 bg-gray-200 rounded" />
+            <div className="h-4 w-full bg-gray-200 rounded" />
+            <div className="h-4 w-5/6 bg-gray-200 rounded" />
+          </div>
+          <div className="lg:col-span-1">
+            <div className="h-96 bg-gray-200 rounded-[20px]" />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }
 export default function TravelTripDetails({
   loaderData,

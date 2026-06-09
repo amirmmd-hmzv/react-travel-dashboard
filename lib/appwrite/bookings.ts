@@ -1,5 +1,6 @@
 import { ID, Query } from "appwrite";
 import { db, appwriteConfig } from "./client";
+import { createSessionClient } from "./server";
 
 export interface Booking {
   $id: string;
@@ -84,4 +85,21 @@ export async function hasUserBookedTrip(accountId: string, tripId: string) {
     ],
   );
   return documents.length > 0;
+}
+
+export async function getServerUserBookings(request: Request) {
+  try {
+    const { account, db: sdb } = createSessionClient(request);
+    const userAccount = await account.get();
+    if (!userAccount?.$id) return [] as Booking[];
+
+    const { documents } = await sdb.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.bookingsCollections,
+      [Query.equal("userId", userAccount.$id), Query.orderDesc("$createdAt")],
+    );
+    return documents as unknown as Booking[];
+  } catch {
+    return [] as Booking[];
+  }
 }

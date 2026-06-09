@@ -1,6 +1,6 @@
 import { Link, useNavigation, type MetaFunction } from "react-router";
 import { getUser } from "lib/appwrite/auth";
-import { getUserBookings, type Booking } from "lib/appwrite/bookings";
+import { getUserBookings, getServerUserBookings, type Booking } from "lib/appwrite/bookings";
 import { TripCardSkeleton } from "~/components";
 import type { Route } from "./+types/my-bookings";
 
@@ -8,16 +8,46 @@ export const meta: MetaFunction = () => [
   { title: "My Bookings — Teal Horizon" },
 ];
 
-export async function clientLoader() {
-  const result = await getUser();
-  const user =
-    result && !(result instanceof Response) && "accountId" in result
-      ? (result as unknown as { accountId: string })
-      : null;
-  if (!user) return { bookings: [] };
-
-  const bookings = await getUserBookings(user.accountId);
+export async function loader({ request }: Route.LoaderArgs) {
+  const bookings = await getServerUserBookings(request);
   return { bookings };
+}
+
+export async function clientLoader({ serverLoader }: Route.ClientLoaderArgs) {
+  const serverData = await serverLoader();
+  if (serverData.bookings.length > 0) return serverData;
+
+  try {
+    const result = await getUser();
+    const user =
+      result && !(result instanceof Response) && "accountId" in result
+        ? (result as unknown as { accountId: string })
+        : null;
+    if (!user) return { bookings: [] as Booking[] };
+
+    const bookings = await getUserBookings(user.accountId);
+    return { bookings };
+  } catch {
+    return { bookings: [] as Booking[] };
+  }
+}
+
+clientLoader.hydrate = true as const;
+
+export function HydrateFallback() {
+  return (
+    <div className="wrapper py-10">
+      <div className="mb-8">
+        <div className="h-10 w-64 bg-gray-200 rounded-lg animate-pulse mb-2" />
+        <div className="h-4 w-48 bg-gray-200 rounded animate-pulse" />
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {Array.from({ length: 3 }).map((_, i) => (
+          <TripCardSkeleton key={i} />
+        ))}
+      </div>
+    </div>
+  );
 }
 
 export default function MyBookings({ loaderData }: Route.ComponentProps) {

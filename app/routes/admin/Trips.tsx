@@ -1,6 +1,6 @@
-import { getAllTrips, mapAppwriteTrips } from "lib/appwrite/trips";
 import { LuPlus } from "react-icons/lu";
 import { useNavigation, type LoaderFunctionArgs } from "react-router";
+import { getAllTrips, mapAppwriteTrips } from "lib/appwrite/trips";
 import { Header, TripCard, TripCardSkeleton } from "~/components";
 import AppPagination from "~/components/AppPagination";
 import type { Route } from "./+types/trips";

@@ -1,5 +1,5 @@
-import { Link, useNavigation, type MetaFunction, useSearchParams } from "react-router";
-import { getAllTrips, mapAppwriteTrips } from "lib/appwrite/trips";
+import { Link, useNavigation, type MetaFunction } from "react-router";
+import { getServerTrips, mapAppwriteTrips } from "lib/appwrite/trips";
 import TripCard from "~/components/TripCard";
 import { TripCardSkeleton } from "~/components";
 import AppPagination from "~/components/AppPagination";
@@ -21,7 +21,7 @@ export async function loader({ request }: Route.LoaderArgs) {
   const page = Math.max(1, parseInt(url.searchParams.get("page") || "1", 10));
   const offset = (page - 1) * LIMIT;
 
-  const { allTrips, total } = await getAllTrips(LIMIT, offset);
+  const { allTrips, total } = await getServerTrips(LIMIT, offset);
 
   return {
     trips: mapAppwriteTrips(allTrips),

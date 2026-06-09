@@ -1,6 +1,7 @@
 import { Query } from "appwrite";
 import { parseTripData } from "lib/utils";
 import { appwriteConfig, db } from "./client";
+import { createAdminClient } from "./server";
 
 export type AppwriteTripDocument = {
   $id: string;
@@ -57,7 +58,7 @@ export const getTripById = async (tripId: string) => {
       return null;
     }
 
-    return trip; // <--- This was missing
+    return trip; 
   } catch (error) {
     console.error("Error fetching trip by ID:", error);
     return null;
@@ -85,3 +86,30 @@ export const getTripCountByUser = async (userId: string): Promise<number> => {
     return 0;
   }
 };
+
+export async function getServerTrips(limit: number, offset: number) {
+  try {
+    const { db: sdb } = createAdminClient();
+    const { documents, total } = await sdb.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.tripsCollections,
+      [Query.limit(limit), Query.offset(offset), Query.orderDesc("$createdAt")],
+    );
+    return { allTrips: documents as unknown as AppwriteTripDocument[], total };
+  } catch {
+    return { allTrips: [], total: 0 };
+  }
+}
+
+export async function getServerTripById(tripId: string) {
+  try {
+    const { db: sdb } = createAdminClient();
+    return await sdb.getDocument(
+      appwriteConfig.databaseId,
+      appwriteConfig.tripsCollections,
+      tripId,
+    );
+  } catch {
+    return null;
+  }
+}

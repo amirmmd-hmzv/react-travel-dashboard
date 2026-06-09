@@ -69,7 +69,14 @@ clientLoader.hydrate = true as const;
 // ⬇️ This renders during SSR (and during hydration while clientLoader runs).
 // Replace with your actual loading skeleton/spinner.
 export function HydrateFallback() {
-  return null; // or <YourAppShell loading /> if you have one
+  return (
+    <div className="flex items-center justify-center min-h-screen bg-light-200">
+      <div className="flex flex-col items-center gap-3">
+        <div className="size-10 rounded-full bg-primary-100/30 animate-pulse" />
+        <div className="h-3 w-36 bg-gray-200 rounded animate-pulse" />
+      </div>
+    </div>
+  );
 }
 
 export const links: Route.LinksFunction = () => [

@@ -1,4 +1,4 @@
-// lib/appwrite/server.ts
+// lib/appwrite/server.ts — shared infrastructure only
 import { Client, Account, Databases, Query } from "node-appwrite";
 import { appwriteConfig } from "./client";
 
@@ -9,7 +9,6 @@ export function createSessionClient(request: Request) {
 
   const cookie = request.headers.get("Cookie") || "";
   
-  // Try both the standard key and the legacy key Appwrite SDK uses
   const cookieNames = [
     `a_session_${appwriteConfig.projectId}`,
     `a_session_${appwriteConfig.projectId}_legacy`,
@@ -23,7 +22,7 @@ export function createSessionClient(request: Request) {
       try {
         client.setSession(decodeURIComponent(match[1]));
       } catch {
-        client.setSession(match[1]); // already decoded
+        client.setSession(match[1]);
       }
       break;
     }
@@ -35,6 +34,15 @@ export function createSessionClient(request: Request) {
   };
 }
 
+export function createAdminClient() {
+  const client = new Client()
+    .setEndpoint(appwriteConfig.endpointUrl)
+    .setProject(appwriteConfig.projectId);
+  return {
+    db: new Databases(client),
+  };
+}
+
 export async function getServerUser(request: Request) {
   try {
     const { account } = createSessionClient(request);
@@ -42,20 +50,6 @@ export async function getServerUser(request: Request) {
   } catch {
     return null;
   }
-}
-
-
-export async function listServerDocuments(
-  request: Request,
-  collectionId: string,
-  queries: string[] = [],
-) {
-  const { db } = createSessionClient(request);
-  return await db.listDocuments(
-    appwriteConfig.databaseId,
-    collectionId,
-    queries,
-  );
 }
 
 export async function checkServerBooking(
@@ -74,6 +68,19 @@ export async function checkServerBooking(
   } catch {
     return false;
   }
+}
+
+export async function listServerDocuments(
+  request: Request,
+  collectionId: string,
+  queries: string[] = [],
+) {
+  const { db } = createSessionClient(request);
+  return await db.listDocuments(
+    appwriteConfig.databaseId,
+    collectionId,
+    queries,
+  );
 }
 
 export async function createServerDocument(

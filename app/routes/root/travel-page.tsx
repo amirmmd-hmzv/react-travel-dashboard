@@ -1,6 +1,6 @@
 import type { MetaFunction } from "react-router";
 import type { Route } from ".react-router/types/app/routes/root/+types/travel-page";
-import { getAllTrips, mapAppwriteTrips } from "lib/appwrite/trips";
+import { getServerTrips, mapAppwriteTrips } from "lib/appwrite/trips";
 import LandingHero from "~/components/LandingHero";
 import FeaturedDestinations from "~/components/FeaturedDestinations";
 import HowItWorks from "~/components/HowItWorks";
@@ -14,7 +14,7 @@ export const meta: MetaFunction = () => [
 ];
 
 export async function loader() {
-  const { allTrips = [] } = await getAllTrips(8, 0).catch(() => ({ allTrips: [] }));
+  const { allTrips = [] } = await getServerTrips(8, 0);
   const trips = mapAppwriteTrips(allTrips);
   return { featured: trips.slice(0, 3), popular: trips.slice(3) };
 }
