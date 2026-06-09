@@ -1,14 +1,28 @@
 import { type ActionFunctionArgs, data } from "react-router";
-import { ID, Query } from "appwrite";
-import { db, appwriteConfig } from "lib/appwrite/client";
+import { ID, Query } from "node-appwrite";
+import { appwriteConfig } from "lib/appwrite/client";
+import { createSessionClient } from "lib/appwrite/server";
 
 export const action = async ({ request }: ActionFunctionArgs) => {
-  const body: { userId?: string; tripId?: string } = await request.json();
-  console.log(body)
-  const { userId, tripId } = body;
+  const { account, db } = createSessionClient(request);
 
-  if (!userId || !tripId) {
-    return data({ error: "userId and tripId are required." }, { status: 400 });
+  let userAccount;
+  try {
+    userAccount = await account.get();
+  } catch {
+    return data({ error: "You must be signed in to book a trip." }, { status: 401 });
+  }
+
+  if (!userAccount?.$id) {
+    return data({ error: "You must be signed in to book a trip." }, { status: 401 });
+  }
+
+  const body: { tripId?: string } = await request.json();
+  const { tripId } = body;
+  const userId = userAccount.$id;
+
+  if (!tripId) {
+    return data({ error: "tripId is required." }, { status: 400 });
   }
 
   try {
@@ -36,7 +50,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     );
 
     const tripDetail = tripDoc.tripDetail
-      ? JSON.parse(tripDoc.tripDetail)
+      ? JSON.parse(tripDoc.tripDetail as string)
       : {};
     const sessionId = `cs_${crypto.randomUUID()}`;
 
@@ -48,11 +62,10 @@ export const action = async ({ request }: ActionFunctionArgs) => {
         userId,
         tripId,
         tripName: tripDetail.name ?? "Untitled Trip",
-        tripImage: tripDoc.imageUrls?.[0] ?? "",
+        tripImage: (tripDoc.imageUrls as string[] | undefined)?.[0] ?? "",
         tripLocation:
           tripDetail.location?.city ?? tripDetail.country ?? "",
         price: tripDetail.estimatedPrice ?? "",
-        // sessionId,
         status: "confirmed",
       },
     );

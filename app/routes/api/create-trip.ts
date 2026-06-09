@@ -1,7 +1,7 @@
 import { type ActionFunctionArgs, data } from "react-router";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { appwriteConfig } from "lib/appwrite/client";
-import { createServerDocument } from "lib/appwrite/server";
+import { createServerDocument, requireAdminUser } from "lib/appwrite/server";
 import { parseMarkdownToJson } from "lib/utils";
 
 interface ActionBody {
@@ -11,12 +11,16 @@ interface ActionBody {
   interests?: string;
   budget?: string;
   groupType?: string;
-  userId :any
 }
 
 export const action = async ({ request }: ActionFunctionArgs) => {
+  const adminUser = await requireAdminUser(request);
+  if (!adminUser) {
+    return data({ error: "Admin access required." }, { status: 403 });
+  }
+
   const body: ActionBody = await request.json();
-  const { country, numberOfDays, travelStyle, interests, budget, groupType,userId } =
+  const { country, numberOfDays, travelStyle, interests, budget, groupType } =
     body;
 
   if (
@@ -30,9 +34,9 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     return data({ error: "All fields are required." }, { status: 400 });
   }
 
-  if (numberOfDays < 1 || numberOfDays > 30) {
+  if (numberOfDays < 1 || numberOfDays > 10) {
     return data(
-      { error: "Duration must be between 1 and 30 days." },
+      { error: "Duration must be between 1 and 10 days." },
       { status: 400 },
     );
   }
@@ -101,7 +105,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
     const imageUrls = (await imageResponse.json()).results
       .slice(0, 3)
-      .map((result: any) => result.urls?.regular || null);
+      .map((result: { urls?: { regular?: string } }) => result.urls?.regular || null);
 
     const result = await createServerDocument(
       request,
@@ -109,7 +113,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       {
         tripDetail: JSON.stringify(trip),
         imageUrls,
-        userId,
+        userId: adminUser.accountId,
       },
     );
 

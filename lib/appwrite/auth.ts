@@ -1,6 +1,7 @@
-// auth.ts
 import { ID, Query } from "appwrite";
+import { Query as ServerQuery } from "node-appwrite";
 import { OAuthProvider, account, db, appwriteConfig } from "../appwrite/client";
+import { listAdminDocuments } from "./server";
 import { redirect } from "react-router";
 
 export interface AppwriteUserDocument {
@@ -154,74 +155,39 @@ export const getAllUsersWithTripCount = async (
   offset: number,
 ) => {
   try {
-    const { documents: users, total } = await db.listDocuments(
-      appwriteConfig.databaseId,
-      appwriteConfig.usersCollections,
-      [Query.limit(limit), Query.offset(offset)],
+    const [usersResult, tripsResult] = await Promise.all([
+      listAdminDocuments(appwriteConfig.usersCollections, [
+        ServerQuery.limit(limit),
+        ServerQuery.offset(offset),
+      ]),
+      listAdminDocuments(appwriteConfig.tripsCollections, [
+        ServerQuery.select(["userId"]),
+        ServerQuery.limit(5000),
+      ]),
+    ]);
+
+    if (usersResult.total === 0) return { users: [], total: 0 };
+
+    const tripCountByUser = tripsResult.documents.reduce(
+      (acc: Record<string, number>, trip) => {
+        const userId = trip.userId as string;
+        if (userId) acc[userId] = (acc[userId] || 0) + 1;
+        return acc;
+      },
+      {},
     );
 
-    if (total === 0) return { users: [], total };
+    const usersWithCounts = usersResult.documents.map((user) => ({
+      ...(user as unknown as AppwriteUserDocument),
+      tripCount: tripCountByUser[user.accountId as string] ?? 0,
+    }));
 
-    const typedUsers = users as unknown as AppwriteUserDocument[];
-
-    // Get trip counts for all users in a single batch query
-    const usersWithCounts = await Promise.all(
-      typedUsers.map(async (user) => {
-        try {
-          const { total: tripCount } = await db.listDocuments(
-            appwriteConfig.databaseId,
-            appwriteConfig.tripsCollections,
-            [Query.equal("userId", user.accountId)],
-          );
-
-          return {
-            ...user,
-            tripCount: tripCount || 0,
-          };
-        } catch (error) {
-          console.error(
-            `Error fetching trip count for user ${user.accountId}:`,
-            error,
-          );
-          return {
-            ...user,
-            tripCount: 0,
-          };
-        }
-      }),
-    );
-
-    return { users: usersWithCounts as AppwriteUserDocument[], total };
+    return {
+      users: usersWithCounts as AppwriteUserDocument[],
+      total: usersResult.total,
+    };
   } catch (e) {
     console.error("Error fetching users with trip count", e);
     return { users: [], total: 0 };
-  }
-};
-export const cleanupDuplicateUsers = async () => {
-  const { documents } = await db.listDocuments(
-    appwriteConfig.databaseId,
-    appwriteConfig.usersCollections,
-    [Query.limit(100)],
-  );
-
-  // Group by accountId
-  const grouped: Record<string, typeof documents> = {};
-  for (const doc of documents) {
-    const id = doc.accountId;
-    if (!grouped[id]) grouped[id] = [];
-    grouped[id].push(doc);
-  }
-
-  for (const [accountId, docs] of Object.entries(grouped)) {
-    if (docs.length > 1) {
-      const [keep, ...duplicates] = docs;
-      for (const doc of duplicates) {
-        await db.deleteDocument(
-          appwriteConfig.databaseId,
-          appwriteConfig.usersCollections,
-          doc.$id,
-        );
-      }
-    }
   }
 };

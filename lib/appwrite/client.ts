@@ -1,4 +1,4 @@
-import { Client, Account, OAuthProvider, Databases, Storage } from "appwrite";
+import { Client, Account, OAuthProvider, Databases } from "appwrite";
 
 export const appwriteConfig = {
   endpointUrl: import.meta.env.VITE_APPWRITE_API_ENDPOINTS,
@@ -16,6 +16,4 @@ const account = new Account(client);
 
 const db = new Databases(client);
 
-const storage = new Storage(client);
-
-export { OAuthProvider, db, storage, account };
+export { OAuthProvider, db, account };

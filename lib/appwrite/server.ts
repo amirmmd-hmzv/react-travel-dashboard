@@ -1,6 +1,15 @@
-// lib/appwrite/server.ts — shared infrastructure only
 import { Client, Account, Databases, Query } from "node-appwrite";
 import { appwriteConfig } from "./client";
+
+export interface ServerUserDocument {
+  $id: string;
+  accountId: string;
+  email: string;
+  name: string;
+  imageUrl: string | null;
+  joinedAt: string;
+  status: "admin" | "user" | string;
+}
 
 export function createSessionClient(request: Request) {
   const client = new Client()
@@ -96,5 +105,45 @@ export async function createServerDocument(
     "unique()",
     data,
     permissions,
+  );
+}
+
+export async function getServerUserDocument(
+  request: Request,
+): Promise<ServerUserDocument | null> {
+  try {
+    const userAccount = await getServerUser(request);
+    if (!userAccount?.$id) return null;
+
+    const { db } = createSessionClient(request);
+    const { documents } = await db.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.usersCollections,
+      [Query.equal("accountId", userAccount.$id), Query.limit(1)],
+    );
+
+    return (documents[0] as unknown as ServerUserDocument | undefined) ?? null;
+  } catch {
+    return null;
+  }
+}
+
+export async function requireAdminUser(
+  request: Request,
+): Promise<ServerUserDocument | null> {
+  const userDoc = await getServerUserDocument(request);
+  if (!userDoc || userDoc.status !== "admin") return null;
+  return userDoc;
+}
+
+export async function listAdminDocuments(
+  collectionId: string,
+  queries: string[] = [],
+) {
+  const { db } = createAdminClient();
+  return db.listDocuments(
+    appwriteConfig.databaseId,
+    collectionId,
+    queries,
   );
 }

@@ -8,10 +8,10 @@ import {
 } from "lib/appwrite/trips";
 import { hasUserBookedTrip } from "lib/appwrite/bookings";
 import { getPillItems } from "lib/tripDetails";
-import { account } from "lib/appwrite/client";          
-import { getExistingUser } from "lib/appwrite/auth";     
+import { account, appwriteConfig } from "lib/appwrite/client";
+import { getExistingUser } from "lib/appwrite/auth";
 import { getServerUser, listServerDocuments, checkServerBooking } from "lib/appwrite/server";
-import { appwriteConfig } from "lib/appwrite/client";   
+import { syncSessionToCookie } from "lib/appwrite/session-cookie";
 import { Query } from "appwrite";                        
 import InfoPill from "~/components/trip/InfoPill";
 import { TripPills, StarRating } from "~/components";
@@ -70,15 +70,7 @@ export async function clientLoader({
     const user = await account.get();
     if (!user?.$id) return serverData;
 
-    // Write session cookie so the NEXT SSR request works
-    try {
-      const session = await account.getSession("current");
-      if (session?.secret) {
-        const cookieName = `a_session_${appwriteConfig.projectId}`;
-        const secure = location.protocol === "https:" ? "; secure" : "";
-        document.cookie = `${cookieName}=${encodeURIComponent(session.secret)}; path=/; max-age=2592000; samesite=lax${secure}`;
-      }
-    } catch {}
+    await syncSessionToCookie();
 
     const currentUser = await getExistingUser(user.$id);
     const alreadyBooked = currentUser
@@ -149,7 +141,8 @@ export default function TravelTripDetails({
       const res = await fetch("/api/create-booking", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId: uid, tripId: trip.id }),
+        body: JSON.stringify({ tripId: trip.id }),
+        credentials: "include",
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);

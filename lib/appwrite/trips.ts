@@ -1,4 +1,5 @@
 import { Query } from "appwrite";
+import { Query as ServerQuery } from "node-appwrite";
 import { parseTripData } from "lib/utils";
 import { appwriteConfig, db } from "./client";
 import { createAdminClient } from "./server";
@@ -26,45 +27,13 @@ export const mapAppwriteTrip = (doc: AppwriteTripDocument): Trip | null => {
 export const mapAppwriteTrips = (docs: AppwriteTripDocument[]): Trip[] =>
   docs.map(mapAppwriteTrip).filter((trip): trip is Trip => trip !== null);
 
-export const getAllTrips = async (limit: number, offset: number) => {
-  try {
-    const { documents: trips, total } = await db.listDocuments(
-      appwriteConfig.databaseId,
-      appwriteConfig.tripsCollections,
-      [Query.limit(limit), Query.offset(offset), Query.orderDesc("$createdAt")],
-    );
+/** Admin/dashboard loaders — uses node-appwrite on the server. */
+export const getAllTrips = async (limit: number, offset: number) =>
+  getServerTrips(limit, offset);
 
-    if (total === 0) {
-      console.error("No trips found");
-      return { allTrips: [], total: 0 };
-    }
-
-    return { allTrips: trips as unknown as AppwriteTripDocument[], total };
-  } catch (error) {
-    console.error("Error fetching all trips:", error);
-    return { allTrips: [], total: 0 };
-  }
-};
-
-export const getTripById = async (tripId: string) => {
-  try {
-    const trip = await db.getDocument(
-      appwriteConfig.databaseId,
-      appwriteConfig.tripsCollections,
-      tripId,
-    );
-
-    if (!trip || !trip.$id) {
-      console.error("Trip not found with ID: ", tripId);
-      return null;
-    }
-
-    return trip;
-  } catch (error) {
-    console.error("Error fetching trip by ID:", error);
-    return null;
-  }
-};
+/** Admin trip detail — uses node-appwrite on the server. */
+export const getTripById = async (tripId: string) =>
+  getServerTripById(tripId);
 
 /**
  * Get count of trips created by a specific user
@@ -94,7 +63,11 @@ export async function getServerTrips(limit: number, offset: number) {
     const { documents, total } = await sdb.listDocuments(
       appwriteConfig.databaseId,
       appwriteConfig.tripsCollections,
-      [Query.limit(limit), Query.offset(offset), Query.orderDesc("$createdAt")],
+      [
+        ServerQuery.limit(limit),
+        ServerQuery.offset(offset),
+        ServerQuery.orderDesc("$createdAt"),
+      ],
     );
     return { allTrips: documents as unknown as AppwriteTripDocument[], total };
   } catch {

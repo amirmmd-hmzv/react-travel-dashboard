@@ -8,7 +8,6 @@ import { Button } from "~/components/ui/button";
 import { LuLoader } from "react-icons/lu";
 import { HiSparkles } from "react-icons/hi";
 import { useNavigate } from "react-router";
-import { account } from "lib/appwrite/client";
 import type { Country, TripFormData, CreateTripResponse } from "~/types";
 
 interface CountryOption {
@@ -104,17 +103,11 @@ const CreateTrip = () => {
       return;
     }
 
-      const user = await account.get();
-       if(!user.$id) {
-           console.error('User not authenticated');
-           setLoading(false)
-           return;
-       }
-
     try {
       const response = await fetch("/api/create-trip", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({
           country: formData.country,
           numberOfDays: formData.duration,
@@ -122,7 +115,6 @@ const CreateTrip = () => {
           interests: formData.interest,
           budget: formData.budget,
           groupType: formData.groupType,
-          userId: user.$id
         }),
       });
 
@@ -159,12 +151,10 @@ const CreateTrip = () => {
               items={countryOptions}
               filterMode="startsWith"
               onChange={(value) => {
-                // پیدا کردن کشور انتخاب شده
                 const selectedCountry = countries.find(
                   (c) => c.value === value,
                 );
 
-                // ذخیره هم country و هم cca3
                 setFormData({
                   ...formData,
                   country: value,

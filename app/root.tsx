@@ -10,9 +10,9 @@ import {
   type LoaderFunctionArgs,
   type ClientLoaderFunctionArgs,
 } from "react-router";
-import { Query } from "appwrite";
 import { UserProvider } from "~/hooks/useCurrentUser";
-import { getServerUser, listServerDocuments } from "lib/appwrite/server";
+import { getServerUserDocument } from "lib/appwrite/server";
+import { syncSessionToCookie } from "lib/appwrite/session-cookie";
 import { appwriteConfig, account } from "lib/appwrite/client";
 import { getExistingUser } from "lib/appwrite/auth";
 import type { Route } from "./+types/root";
@@ -20,15 +20,8 @@ import "./app.css";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   try {
-    const userAccount = await getServerUser(request);
-    if (!userAccount?.$id) return { currentUser: null };
-
-    const { documents } = await listServerDocuments(
-      request,
-      appwriteConfig.usersCollections,
-      [Query.equal("accountId", userAccount.$id), Query.limit(1)],
-    );
-    return { currentUser: documents?.[0] ?? null };
+    const userDoc = await getServerUserDocument(request);
+    return { currentUser: userDoc };
   } catch {
     return { currentUser: null };
   }
@@ -43,17 +36,7 @@ export async function clientLoader({ serverLoader }: ClientLoaderFunctionArgs) {
     const user = await account.get();
     if (!user?.$id) return { currentUser: null };
 
-    // Write session cookie to our domain so the NEXT SSR request works
-    try {
-      const session = await account.getSession("current");
-      if (session?.secret) {
-        const cookieName = `a_session_${appwriteConfig.projectId}`;
-        const secure = location.protocol === "https:" ? "; secure" : "";
-        // Write BOTH keys so server.ts can find it regardless of SDK version
-        document.cookie = `${cookieName}=${encodeURIComponent(session.secret)}; path=/; max-age=2592000; samesite=lax${secure}`;
-        document.cookie = `${cookieName}_legacy=${encodeURIComponent(session.secret)}; path=/; max-age=2592000; samesite=lax${secure}`;
-      }
-    } catch { /* best-effort */ }
+    await syncSessionToCookie();
 
     const existingUser = await getExistingUser(user.$id);
     return { currentUser: existingUser ?? null };
