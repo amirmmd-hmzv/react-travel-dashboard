@@ -71,12 +71,12 @@ export async function loader() {
 
   const allTrips = mapAppwriteTrips(trips.allTrips);
 
-  const mappedUsers =
-    allUsers?.users.map((user: any) => ({
-      imageUrl: user.imageUrl,
+  const mappedUsers: UsersItineraryCount[] =
+    (allUsers?.users ?? []).map((user) => ({
+      imageUrl: user.imageUrl ?? "",
       name: user.name,
-      count: user.tripCount,
-    })) || [];
+      count: user.tripCount ?? 0,
+    }));
 
   return {
     dashboardStats,

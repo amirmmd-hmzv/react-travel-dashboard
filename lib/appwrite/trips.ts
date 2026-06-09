@@ -58,7 +58,7 @@ export const getTripById = async (tripId: string) => {
       return null;
     }
 
-    return trip; 
+    return trip;
   } catch (error) {
     console.error("Error fetching trip by ID:", error);
     return null;

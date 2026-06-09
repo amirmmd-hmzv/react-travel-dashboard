@@ -143,7 +143,6 @@ export const getAllUsersWithTripCount = async (
   offset: number,
 ) => {
   try {
-    const { db: database } = await import("./client");
     const { documents: users, total } = await db.listDocuments(
       appwriteConfig.databaseId,
       appwriteConfig.usersCollections,
@@ -152,9 +151,11 @@ export const getAllUsersWithTripCount = async (
 
     if (total === 0) return { users: [], total };
 
+    const typedUsers = users as unknown as AppwriteUserDocument[];
+
     // Get trip counts for all users in a single batch query
     const usersWithCounts = await Promise.all(
-      users.map(async (user) => {
+      typedUsers.map(async (user) => {
         try {
           const { total: tripCount } = await db.listDocuments(
             appwriteConfig.databaseId,
@@ -179,7 +180,7 @@ export const getAllUsersWithTripCount = async (
       }),
     );
 
-    return { users: usersWithCounts, total };
+    return { users: usersWithCounts as AppwriteUserDocument[], total };
   } catch (e) {
     console.error("Error fetching users with trip count", e);
     return { users: [], total: 0 };

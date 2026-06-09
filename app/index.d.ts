@@ -140,6 +140,17 @@ type GetAllTripsResponse = {
   total: number;
 };
 
+declare interface AppwriteUserDocument {
+  $id: string;
+  accountId: string;
+  email: string;
+  name: string;
+  imageUrl: string | null;
+  joinedAt: string;
+  status: string;
+  tripCount?: number;
+}
+
 declare interface UsersItineraryCount {
   imageUrl: string;
   name: string;

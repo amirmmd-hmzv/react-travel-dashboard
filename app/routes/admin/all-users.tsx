@@ -1,4 +1,4 @@
-import {  getAllUsersWithTripCount } from "lib/appwrite/auth";
+import { getAllUsersWithTripCount } from "lib/appwrite/auth";
 import { cn, formatDate } from "lib/utils";
 import { Header } from "~/components";
 import { CustomTable } from "~/components/CustomTable";

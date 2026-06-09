@@ -25,10 +25,12 @@ export async function clientLoader() {
       return redirect("/");
     }
 
-    return existingUser?.$id ? existingUser : await storeUserData();
-   
+    if (existingUser?.$id) {
+      return {};
+    }
 
-
+    await storeUserData();
+    return {};
   } catch (e) {
     console.error("Error client loader", e);
     return redirect("/sign-in");
