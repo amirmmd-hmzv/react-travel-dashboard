@@ -1,6 +1,6 @@
 import { getAllUsersWithTripCount } from "lib/appwrite/auth";
 import { useUser } from "~/hooks/useCurrentUser";
-import { Header, StatsCard, TripCard, TripCardSkeleton } from "~/components";
+import { Header, StatsCard, AsyncTripGrid, ChartCard } from "~/components";
 import { useNavigation } from "react-router";
 import type { Route } from "./+types/dashboard";
 import {
@@ -93,15 +93,18 @@ export async function loader() {
 // ─── component ───────────────────────────────────────────────────────────────
 
 const Dashboard = ({ loaderData }: Route.ComponentProps) => {
-  const navigation = useNavigation();
+  const isLoading = useNavigation().state === "loading";
   const currentUser = useUser();
-  const isLoading = navigation.state === "loading";
   const user = currentUser as { name?: string } | null;
   const { dashboardStats, allTrips, userGrowth, tripsByTravelStyle, allUsers } =
     loaderData;
 
   const { totalTrips, totalUsers, tripsCreated, userRole, usersJoined } =
     dashboardStats;
+
+  const validTrips = allTrips.filter(
+    (t) => t.name && t.estimatedPrice && t.imageUrls?.[0],
+  );
 
   const trips = allTrips.map((trip) => ({
     imageUrl: trip.imageUrls[0],
@@ -157,33 +160,13 @@ const Dashboard = ({ loaderData }: Route.ComponentProps) => {
       {/* ── Trips ── */}
       <section className="container">
         <h1 className="text-xl font-semibold text-dark-100">Trips</h1>
-        <div className="trip-grid">
-          {isLoading
-            ? Array.from({ length: 4 }).map((_, i) => <TripCardSkeleton key={i} />)
-            : allTrips.map((trip) => {
-            if (!trip.name || !trip.estimatedPrice || !trip.imageUrls?.[0]) {
-              return null;
-            }
-            return (
-              <TripCard
-                key={trip.id}
-                id={trip.id.toString()}
-                name={trip.name}
-                tags={[trip.interests!, trip.travelStyle!]}
-                imageUrl={trip.imageUrls[0]}
-                price={trip.estimatedPrice}
-                location={trip.itinerary?.[0]?.location ?? ""}
-              />
-            );
-          })}
-        </div>
+        <AsyncTripGrid loading={isLoading} trips={validTrips} skeletonCount={4} />
       </section>
 
       {/* ── Charts ── */}
       <section className="grid grid-cols-1 lg:grid-cols-2 gap-5">
         {/* User Growth — Column + SplineArea overlay (matches original) */}
-        <div className="flex flex-col gap-3 rounded-xl border bg-card p-5 shadow-sm">
-          <h3 className="text-base font-semibold text-dark-100">User Growth</h3>
+        <ChartCard title="User Growth">
           <ChartContainer
             config={userGrowthChartConfig}
             className="h-80 w-full"
@@ -263,13 +246,10 @@ const Dashboard = ({ loaderData }: Route.ComponentProps) => {
               />
             </AreaChart>
           </ChartContainer>
-        </div>
+        </ChartCard>
 
         {/* Trip Trends — Column only (matches original) */}
-        <div className="flex flex-col gap-3 rounded-xl border bg-card p-5 shadow-sm">
-          <h3 className="text-base font-semibold text-dark-100">
-            Trip Trends by Travel Style
-          </h3>
+        <ChartCard title="Trip Trends by Travel Style">
           <ChartContainer
             config={tripTrendsChartConfig}
             className="h-80 w-full"
@@ -325,7 +305,7 @@ const Dashboard = ({ loaderData }: Route.ComponentProps) => {
               />
             </BarChart>
           </ChartContainer>
-        </div>
+        </ChartCard>
       </section>
 
       <section className="grid grid-cols-1 lg:grid-cols-2 gap-5">

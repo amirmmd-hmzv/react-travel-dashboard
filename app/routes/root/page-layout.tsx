@@ -1,8 +1,8 @@
 // page-layout.tsx
 import { Outlet } from "react-router";
 import { useUser } from "~/hooks/useCurrentUser";
-import SiteHeader from "~/components/SiteHeader";
-import SiteFooter from "~/components/SiteFooter";
+import SiteHeader from "~/components/layout/SiteHeader";
+import SiteFooter from "~/components/layout/SiteFooter";
 
 function PageShell() {
   const currentUser = useUser();

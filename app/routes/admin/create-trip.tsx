@@ -3,7 +3,7 @@ import { Combobox } from "~/components/ui/combobox";
 import { useEffect, useMemo, useState } from "react";
 import { comboBoxItems, selectItems } from "~/constants";
 import { formatKey } from "lib/utils";
-import { WorldMap } from "~/components/WorldMap";
+import { WorldMap } from "~/components/sections/WorldMap";
 import { Button } from "~/components/ui/button";
 import { LuLoader } from "react-icons/lu";
 import { HiSparkles } from "react-icons/hi";

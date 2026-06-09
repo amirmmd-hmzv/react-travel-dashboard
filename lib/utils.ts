@@ -82,3 +82,11 @@ export const formatKey = (key: keyof TripFormData) => {
     .replace(/([A-Z])/g, " $1")
     .replace(/^./, (str) => str.toUpperCase());
 };
+
+export function getLocationString(trip: Trip): string {
+  return trip.itinerary?.[0]?.location ?? trip.location?.city ?? "";
+}
+
+export function getFirstImage(trip: Trip): string {
+  return trip.imageUrls?.[0] ?? "";
+}

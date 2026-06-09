@@ -1,5 +1,6 @@
 import { LuSparkles, LuSearch, LuCreditCard } from "react-icons/lu";
 import type { IconType } from "react-icons";
+import { Section } from "~/components";
 
 interface Step {
   step: string;
@@ -34,8 +35,7 @@ const STEPS: Step[] = [
 
 const HowItWorks = () => {
   return (
-    <section className="py-20 bg-white">
-      <div className="wrapper">
+    <Section bgWhite>
         <div className="text-center mb-14">
           <p className="font-plus-jakarta text-primary-100 text-sm font-semibold uppercase tracking-widest mb-2">
             How It Works
@@ -68,8 +68,7 @@ const HowItWorks = () => {
             );
           })}
         </div>
-      </div>
-    </section>
+    </Section>
   );
 };
 

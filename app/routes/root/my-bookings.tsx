@@ -1,7 +1,8 @@
 import { Link, useNavigation, type MetaFunction } from "react-router";
 import { getUser } from "lib/appwrite/auth";
 import { getUserBookings, getServerUserBookings, type Booking } from "lib/appwrite/bookings";
-import { TripCardSkeleton } from "~/components";
+import { EmptyState, TripCardSkeleton } from "~/components";
+import { formatDate } from "lib/utils";
 import type { Route } from "./+types/my-bookings";
 
 export const meta: MetaFunction = () => [
@@ -52,8 +53,7 @@ export function HydrateFallback() {
 
 export default function MyBookings({ loaderData }: Route.ComponentProps) {
   const { bookings } = loaderData;
-  const navigation = useNavigation();
-  const loading = navigation.state === "loading";
+  const loading = useNavigation().state === "loading";
 
   return (
     <div className="wrapper py-10">
@@ -79,23 +79,12 @@ export default function MyBookings({ loaderData }: Route.ComponentProps) {
       )}
 
       {!loading && bookings.length === 0 && (
-        <div className="flex flex-col items-center justify-center py-24 gap-6">
-          <img src="/assets/icons/destination.svg" alt="" className="h-16 w-16 opacity-30" />
-          <div className="text-center">
-            <p className="font-clash-display text-dark-100 text-xl font-semibold mb-1">
-              No trips booked yet
-            </p>
-            <p className="font-plus-jakarta text-dark-400 text-sm">
-              Start exploring and book your next adventure.
-            </p>
-          </div>
-          <Link
-            to="/trips"
-            className="bg-primary-100 hover:bg-primary-500 text-white font-plus-jakarta font-semibold px-7 py-3 rounded-lg text-sm transition-colors"
-          >
-            Browse Trips
-          </Link>
-        </div>
+        <EmptyState
+          title="No trips booked yet"
+          description="Start exploring and book your next adventure."
+          ctaText="Browse Trips"
+          ctaLink="/trips"
+        />
       )}
 
       {!loading && bookings.length > 0 && (
@@ -130,7 +119,7 @@ export default function MyBookings({ loaderData }: Route.ComponentProps) {
                     </span>
                   )}
                   <span className="font-plus-jakarta text-gray-100 text-xs">
-                    Booked {new Date(booking.$createdAt).toLocaleDateString()}
+                    Booked {formatDate(booking.$createdAt)}
                   </span>
                 </div>
                 <span className="inline-flex self-start items-center gap-1 bg-success-50 text-success-700 text-xs font-plus-jakarta font-semibold px-2.5 py-0.5 rounded-full">

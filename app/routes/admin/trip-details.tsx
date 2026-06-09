@@ -1,8 +1,8 @@
 import { getAllTrips, getTripById, mapAppwriteTrips } from "lib/appwrite/trips";
 import { parseTripData } from "lib/utils";
+import { Header, AsyncTripGrid } from "~/components";
 import { useNavigation } from "react-router";
-import { Header, TripCard, TripCardSkeleton } from "~/components";
-import TripDetailsBody from "~/components/TripDetailsBody";
+import TripDetailsBody from "~/components/trip/TripDetailsBody";
 import type { Route } from "./+types/trip-details";
 
 export const loader = async ({ params }: { params: { tripId: string } }) => {
@@ -24,8 +24,7 @@ export const loader = async ({ params }: { params: { tripId: string } }) => {
 };
 
 const TripDetails = ({ loaderData }: Route.ComponentProps) => {
-  const navigation = useNavigation();
-  const isLoading = navigation.state === "loading";
+  const isLoading = useNavigation().state === "loading";
   const tripData = parseTripData(loaderData?.trip?.tripDetail);
 
   if (!tripData) {
@@ -53,21 +52,7 @@ const TripDetails = ({ loaderData }: Route.ComponentProps) => {
 
       <section className="flex flex-col gap-6">
         <h2 className="p-24-semibold text-dark-100">Popular Trips</h2>
-        <div className="trip-grid">
-          {isLoading
-            ? Array.from({ length: 4 }).map((_, i) => <TripCardSkeleton key={i} />)
-            : loaderData.popularTrips.map((trip) => (
-            <TripCard
-              key={trip.id}
-              id={trip.id}
-              name={trip.name}
-              imageUrl={trip.imageUrls[0]}
-              location={trip.itinerary?.[0]?.location ?? ""}
-              tags={[trip.interests, trip.travelStyle]}
-              price={trip.estimatedPrice}
-            />
-          ))}
-        </div>
+        <AsyncTripGrid loading={isLoading} trips={loaderData.popularTrips} skeletonCount={4} />
       </section>
     </main>
   );

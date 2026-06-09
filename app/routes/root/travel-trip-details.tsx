@@ -13,11 +13,11 @@ import { getExistingUser } from "lib/appwrite/auth";
 import { getServerUser, listServerDocuments, checkServerBooking } from "lib/appwrite/server";
 import { appwriteConfig } from "lib/appwrite/client";   
 import { Query } from "appwrite";                        
-import StarRating from "~/components/StarRating";
-import InfoPill from "~/components/InfoPill";
+import InfoPill from "~/components/trip/InfoPill";
+import { TripPills, StarRating } from "~/components";
 import Chip from "~/components/ui/chip";
 import { Button } from "~/components/ui/button";
-import TripDetailNav from "~/components/TripDetailNav";
+import TripDetailNav from "~/components/trip/TripDetailNav";
 import type { Route } from "./+types/travel-trip-details";
 
 export const meta: MetaFunction = ({ data }) => [
@@ -217,27 +217,8 @@ export default function TravelTripDetails({
               </section>
             )}
 
-            {/* Pill chips */}
             {pillItems.length > 0 && (
-              <section className="flex gap-3 md:gap-5 items-center flex-wrap">
-                {pillItems.map((pill, i) => (
-                  <Chip
-                    key={i}
-                    variant="custom"
-                    className={`${pill.bg} !text-base !font-medium !px-4`}
-                  >
-                    {pill.text}
-                  </Chip>
-                ))}
-                {trip.rating != null && (
-                  <>
-                    <StarRating rating={trip.rating} />
-                    <Chip className="!bg-yellow-50 !text-yellow-700 !border-yellow-100">
-                      {trip.rating.toFixed(1)}/5
-                    </Chip>
-                  </>
-                )}
-              </section>
+              <TripPills pillItems={pillItems} rating={trip.rating ?? 0} />
             )}
 
             {/* Title section */}

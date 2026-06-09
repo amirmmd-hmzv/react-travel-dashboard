@@ -3,7 +3,7 @@ import { LuLogOut } from "react-icons/lu";
 import { Link, NavLink, useLoaderData } from "react-router";
 import { sidebarItems } from "~/constants";
 import { useState } from "react";
-import LogoutConfirmDialog from "./LogoutConfirmDialog";
+import LogoutConfirmDialog from "~/components/LogoutConfirmDialog";
 
 interface NavItemsProps {
   onClosesidebar?: () => void;
@@ -11,6 +11,8 @@ interface NavItemsProps {
 
 const NavItems = ({ onClosesidebar }: NavItemsProps) => {
   const user = useLoaderData();
+
+  console.log(user)
   const [isLogoutDialogOpen, setIsLogoutDialogOpen] = useState(false);
 
   const handleLogoutClick = () => {

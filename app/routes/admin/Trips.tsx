@@ -1,7 +1,8 @@
 import { LuPlus } from "react-icons/lu";
-import { useNavigation, type LoaderFunctionArgs } from "react-router";
+import { type LoaderFunctionArgs } from "react-router";
 import { getAllTrips, mapAppwriteTrips } from "lib/appwrite/trips";
-import { Header, TripCard, TripCardSkeleton } from "~/components";
+import { Header, AsyncTripGrid } from "~/components";
+import { useNavigation } from "react-router";
 import AppPagination from "~/components/AppPagination";
 import type { Route } from "./+types/trips";
 import type { Trip } from "~/types";
@@ -27,8 +28,7 @@ const Trips = ({ loaderData }: Route.ComponentProps) => {
   const total: number = loaderData?.total ?? 0;
   const currentPage: number = loaderData?.currentPage ?? 1;
   const totalPages = Math.ceil(total / LIMIT);
-  const navigation = useNavigation();
-  const isLoading = navigation.state === "loading";
+  const isLoading = useNavigation().state === "loading";
 
   return (
     <main className="dashboard wrapper">
@@ -45,30 +45,9 @@ const Trips = ({ loaderData }: Route.ComponentProps) => {
           Manage Created Trips
         </h1>
 
-        {isLoading ? (
-          <div className="trip-grid mb-4">
-            {Array.from({ length: LIMIT }).map((_, i) => (
-              <TripCardSkeleton key={i} />
-            ))}
-          </div>
-        ) : (
-          <div className="trip-grid mb-4">
-            {trips.map((trip) => (
-              <TripCard
-                key={trip.id}
-                id={trip.id}
-                name={trip.name}
-                imageUrl={trip.imageUrls[0]}
-                location={trip.itinerary?.[0]?.location ?? ""}
-                tags={[trip.interests, trip.travelStyle]}
-                price={trip.estimatedPrice}
-              />
-            ))}
-          </div>
-        )}
+        <AsyncTripGrid loading={isLoading} trips={trips} skeletonCount={LIMIT} />
 
         <AppPagination
-        
           currentPage={currentPage}
           totalPages={totalPages}
           className="mb-4"

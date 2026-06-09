@@ -1,13 +1,13 @@
 import { Link } from "react-router";
 import { Button } from "~/components/ui/button";
 import { useUser } from "~/hooks/useCurrentUser";
+import { Section } from "~/components";
 
 const CTABanner = () => {
   const currentUser = useUser();
 
   return (
-    <section className="py-20">
-      <div className="wrapper">
+    <Section>
         <div className="relative rounded-[28px] overflow-hidden bg-gradient-to-br from-primary-100 to-navy-500 p-12 md:p-16 text-center shadow-500">
           <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />
           <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/2" />
@@ -28,8 +28,7 @@ const CTABanner = () => {
             </Link>
           </div>
         </div>
-      </div>
-    </section>
+    </Section>
   );
 };
 

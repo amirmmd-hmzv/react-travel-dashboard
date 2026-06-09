@@ -1,5 +1,7 @@
 import { Link } from "react-router";
 import type { Trip } from "~/types";
+import { getLocationString } from "lib/utils";
+import { SectionHeader } from "~/components";
 
 interface FeaturedDestinationsProps {
   featured: Trip[];
@@ -8,29 +10,15 @@ interface FeaturedDestinationsProps {
 const FeaturedDestinations = ({ featured }: FeaturedDestinationsProps) => {
   if (featured.length === 0) return null;
 
-  const getLocationString = (trip: Trip) =>
-    trip.itinerary?.[0]?.location ?? trip.location?.city ?? "";
-
   return (
     <section className="py-20">
       <div className="wrapper">
-        <div className="flex items-end justify-between mb-10">
-          <div>
-            <p className="font-plus-jakarta text-primary-100 text-sm font-semibold uppercase tracking-widest mb-2">
-              Curated for You
-            </p>
-            <h2 className="font-clash-display text-dark-100 text-4xl font-bold">
-              Featured Destinations
-            </h2>
-          </div>
-          <Link
-            to="/trips"
-            className="hidden sm:flex items-center gap-1.5 text-primary-100 font-plus-jakarta text-sm font-semibold hover:text-primary-500 transition-colors"
-          >
-            View all trips
-            <img src="/assets/icons/arrow-down.svg" alt="" className="h-4 w-4 -rotate-90" />
-          </Link>
-        </div>
+        <SectionHeader
+          eyebrow="Curated for You"
+          title="Featured Destinations"
+          linkText="View all trips"
+          linkTo="/trips"
+        />
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {featured.map((trip) => (

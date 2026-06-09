@@ -1,12 +1,12 @@
 import type { MetaFunction } from "react-router";
 import type { Route } from ".react-router/types/app/routes/root/+types/travel-page";
 import { getServerTrips, mapAppwriteTrips } from "lib/appwrite/trips";
-import LandingHero from "~/components/LandingHero";
-import FeaturedDestinations from "~/components/FeaturedDestinations";
-import HowItWorks from "~/components/HowItWorks";
-import PopularTrips from "~/components/PopularTrips";
-import Testimonials from "~/components/Testimonials";
-import CTABanner from "~/components/CTABanner";
+import LandingHero from "~/components/sections/LandingHero";
+import FeaturedDestinations from "~/components/sections/FeaturedDestinations";
+import HowItWorks from "~/components/sections/HowItWorks";
+import PopularTrips from "~/components/sections/PopularTrips";
+import Testimonials from "~/components/sections/Testimonials";
+import CTABanner from "~/components/sections/CTABanner";
 
 export const meta: MetaFunction = () => [
   { title: "Teal Horizon — AI Travel Itineraries" },

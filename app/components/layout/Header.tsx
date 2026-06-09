@@ -1,6 +1,6 @@
 import { cn } from "lib/utils";
 import { Link, useLocation } from "react-router";
-import { Button } from "./ui/button";
+import { Button } from "~/components/ui/button";
 
 interface HeaderProps {
   title: string;
