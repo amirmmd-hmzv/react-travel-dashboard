@@ -10,9 +10,7 @@ interface NavItemsProps {
 }
 
 const NavItems = ({ onClosesidebar }: NavItemsProps) => {
-  const user = useLoaderData();
-
-  console.log(user)
+  const { user } = useLoaderData() as { user: Record<string, any> | null };
   const [isLogoutDialogOpen, setIsLogoutDialogOpen] = useState(false);
 
   const handleLogoutClick = () => {

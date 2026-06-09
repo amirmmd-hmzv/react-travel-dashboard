@@ -1,17 +1,9 @@
 import { getExistingUser, storeUserData } from "lib/appwrite/auth";
 import { account } from "lib/appwrite/client";
-import { getServerUser } from "lib/appwrite/server";
 import { Outlet, redirect, type LoaderFunctionArgs } from "react-router";
 import { MobileSidebar, NavItems } from "~/components";
 
-export async function loader({ request }: LoaderFunctionArgs) {
-  try {
-    await getServerUser(request);
-    return {};
-  } catch {
-    return redirect("/sign-in");
-  }
-}
+
 
 export async function clientLoader() {
   try {
@@ -26,16 +18,20 @@ export async function clientLoader() {
     }
 
     if (existingUser?.$id) {
-      return {};
+      return { user: existingUser };
     }
 
-    await storeUserData();
-    return {};
+    const newUser = await storeUserData();
+    if (newUser instanceof Response) return newUser;
+    return { user: newUser ?? null };
   } catch (e) {
     console.error("Error client loader", e);
     return redirect("/sign-in");
   }
 }
+
+
+
 export default function AdminLayout() {
   return (
     <div className="admin-layout ">
