@@ -3,6 +3,17 @@ import { ID, Query } from "appwrite";
 import { OAuthProvider, account, db, appwriteConfig } from "../appwrite/client";
 import { redirect } from "react-router";
 
+export interface AppwriteUserDocument {
+  $id: string;
+  accountId: string;
+  email: string;
+  name: string;
+  imageUrl: string | null;
+  joinedAt: string;
+  status: string;
+  tripCount?: number;
+}
+
 export const getExistingUser = async (id: string) => {
   try {
     const { documents, total } = await db.listDocuments(

@@ -18,6 +18,7 @@ import {
   TableHeader,
   TableRow,
 } from "~/components/ui/table";
+import type { UsersItineraryCount } from "~/types";
 
 // shadcn chart + recharts
 import {

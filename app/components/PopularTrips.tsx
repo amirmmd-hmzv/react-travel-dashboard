@@ -1,6 +1,7 @@
 import { Link } from "react-router";
 import { Button } from "~/components/ui/button";
 import TripCard from "~/components/TripCard";
+import type { Trip } from "~/types";
 
 interface PopularTripsProps {
   popular: Trip[];

@@ -3,12 +3,19 @@ import { useMemo } from "react";
 import { LuArrowDown, LuArrowUp } from "react-icons/lu";
 import MiniChart from "./MiniChart";
 
+interface StatsCardProps {
+  headTitle: string;
+  total: number;
+  lastMonthCount: number;
+  currentMonthCount: number;
+}
+
 const StatsCard = ({
   headTitle,
   currentMonthCount,
   lastMonthCount,
   total,
-}: StatsCard) => {
+}: StatsCardProps) => {
   const { percentage, trend } = useMemo(() => {
     return calculateTrendPercentage(currentMonthCount, lastMonthCount);
   }, [currentMonthCount, lastMonthCount]);

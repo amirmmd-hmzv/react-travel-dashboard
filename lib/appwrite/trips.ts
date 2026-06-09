@@ -2,6 +2,7 @@ import { Query } from "appwrite";
 import { parseTripData } from "lib/utils";
 import { appwriteConfig, db } from "./client";
 import { createAdminClient } from "./server";
+import type { Trip } from "app/types";
 
 export type AppwriteTripDocument = {
   $id: string;

@@ -4,6 +4,7 @@ import { getAllTrips, mapAppwriteTrips } from "lib/appwrite/trips";
 import { Header, TripCard, TripCardSkeleton } from "~/components";
 import AppPagination from "~/components/AppPagination";
 import type { Route } from "./+types/trips";
+import type { Trip } from "~/types";
 
 const LIMIT = 8;
 

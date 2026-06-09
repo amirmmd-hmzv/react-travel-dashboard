@@ -1,5 +1,6 @@
 import { parseTripData } from "lib/utils";
 import { db, appwriteConfig } from "./client";
+import type { DashboardStats } from "app/types";
 
 interface Document {
   [key: string]: any;

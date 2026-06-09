@@ -9,6 +9,7 @@ import { LuLoader } from "react-icons/lu";
 import { HiSparkles } from "react-icons/hi";
 import { useNavigate } from "react-router";
 import { account } from "lib/appwrite/client";
+import type { Country, TripFormData, CreateTripResponse } from "~/types";
 
 interface CountryOption {
   value: string;

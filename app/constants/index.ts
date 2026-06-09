@@ -1,5 +1,6 @@
 import type { IconType } from "react-icons";
 import { LuHouse, LuUsers, LuEarth } from "react-icons/lu";
+import type { TripFormData } from "~/types";
 
 type SidebarItem = {
   id: number;

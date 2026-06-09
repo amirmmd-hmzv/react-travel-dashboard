@@ -3,6 +3,15 @@ import { Link, useLocation } from "react-router";
 import Chip from "./ui/chip";
 import { getFirstWord } from "lib/utils";
 
+interface TripCardProps {
+  id: string;
+  name: string;
+  location: string;
+  imageUrl: string;
+  tags: string[];
+  price: string;
+}
+
 const TripCard = ({
   id,
   imageUrl,

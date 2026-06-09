@@ -1,3 +1,8 @@
+interface InfoPillProps {
+  text: string;
+  image: string;
+}
+
 const InfoPill = ({ text, image }: InfoPillProps) => {
   return (
     <figure className="info-pill">
