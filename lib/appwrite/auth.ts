@@ -100,6 +100,9 @@ export const logoutUser = async () => {
     const expired = `; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; samesite=lax${location.protocol === "https:" ? "; secure" : ""}`;
     document.cookie = `${base}=${expired}`;
     document.cookie = `${base}_legacy=${expired}`;
+    localStorage.removeItem(base);
+    localStorage.removeItem(`${base}_legacy`);
+    localStorage.removeItem("cookieFallback");
   } catch (error) {
     console.error("Error during logout:", error);
   }

@@ -5,7 +5,7 @@ import SiteHeader from "~/components/layout/SiteHeader";
 import SiteFooter from "~/components/layout/SiteFooter";
 
 function PageShell() {
-  const currentUser = useUser();
+  const { user: currentUser } = useUser();
 
   return (
     <div className="flex flex-col min-h-screen">

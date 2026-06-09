@@ -4,7 +4,7 @@ import { useUser } from "~/hooks/useCurrentUser";
 import { Section } from "~/components";
 
 const CTABanner = () => {
-  const currentUser = useUser();
+  const { user: currentUser } = useUser();
 
   return (
     <Section>

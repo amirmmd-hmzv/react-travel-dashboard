@@ -94,7 +94,7 @@ export async function loader() {
 
 const Dashboard = ({ loaderData }: Route.ComponentProps) => {
   const isLoading = useNavigation().state === "loading";
-  const currentUser = useUser();
+  const { user: currentUser } = useUser();
   const user = currentUser as { name?: string } | null;
   const { dashboardStats, allTrips, userGrowth, tripsByTravelStyle, allUsers } =
     loaderData;

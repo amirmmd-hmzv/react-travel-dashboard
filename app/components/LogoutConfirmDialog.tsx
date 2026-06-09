@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { useNavigate } from "react-router";
+import { useRevalidator } from "react-router";
 import { logoutUser } from "lib/appwrite/auth";
+import { useUser } from "~/hooks/useCurrentUser";
 import {
   Dialog,
   DialogContent,
@@ -30,15 +31,17 @@ const LogoutConfirmDialog = ({
   open,
   onOpenChange,
 }: LogoutConfirmDialogProps) => {
-  const navigate = useNavigate();
+  const { setUser } = useUser();
+  const revalidator = useRevalidator();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const handleConfirmLogout = async () => {
     setIsLoggingOut(true);
     try {
       await logoutUser();
+      setUser(null);
       onOpenChange(false);
-      navigate("/sign-in");
+      revalidator.revalidate();
     } catch (error) {
       console.error("Error logging out:", error);
       setIsLoggingOut(false);

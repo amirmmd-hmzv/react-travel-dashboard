@@ -10,7 +10,7 @@ const STATS = [
 ];
 
 const LandingHero = () => {
-  const currentUser = useUser();
+  const { user: currentUser } = useUser();
 
   if (currentUser) {
     return (

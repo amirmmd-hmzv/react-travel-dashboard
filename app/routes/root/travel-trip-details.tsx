@@ -1,6 +1,6 @@
 // travel-trip-details.tsx
 import { Link, useNavigate, type MetaFunction } from "react-router";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   getServerTripById,
   mapAppwriteTrips,
@@ -18,6 +18,7 @@ import { TripPills, StarRating } from "~/components";
 import Chip from "~/components/ui/chip";
 import { Button } from "~/components/ui/button";
 import TripDetailNav from "~/components/trip/TripDetailNav";
+import { useUser } from "~/hooks/useCurrentUser";
 import type { Route } from "./+types/travel-trip-details";
 
 export const meta: MetaFunction = ({ data }) => [
@@ -113,11 +114,16 @@ export function HydrateFallback() {
 export default function TravelTripDetails({
   loaderData,
 }: Route.ComponentProps) {
-  const { trip, currentUser } = loaderData;
+  const { trip } = loaderData;
+  const { user: currentUser } = useUser();
   const [alreadyBooked, setAlreadyBooked] = useState(loaderData.alreadyBooked);
 
   const navigate = useNavigate();
   const [booking, setBooking] = useState(false);
+
+  useEffect(() => {
+    if (!currentUser) setAlreadyBooked(false);
+  }, [currentUser]);
 
   if (!trip) return null;
 
