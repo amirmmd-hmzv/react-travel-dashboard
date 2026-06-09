@@ -1,25 +1,31 @@
 import { type ActionFunctionArgs, data } from "react-router";
 import { ID, Query } from "node-appwrite";
 import { appwriteConfig } from "lib/appwrite/client";
-import { createSessionClient } from "lib/appwrite/server";
+import { createAdminClient } from "lib/appwrite/server";
 
 export const action = async ({ request }: ActionFunctionArgs) => {
-  const { account, db } = createSessionClient(request);
+  const { db } = createAdminClient();
 
-  let userAccount;
+  const body: { tripId?: string; userId?: string } = await request.json();
+  const { tripId, userId } = body;
+
+  if (!userId) {
+    return data({ error: "You must be signed in to book a trip." }, { status: 401 });
+  }
+
+  // Verify the user exists in the database
   try {
-    userAccount = await account.get();
+    const { total } = await db.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.usersCollections,
+      [Query.equal("accountId", userId), Query.limit(1)],
+    );
+    if (total === 0) {
+      return data({ error: "You must be signed in to book a trip." }, { status: 401 });
+    }
   } catch {
     return data({ error: "You must be signed in to book a trip." }, { status: 401 });
   }
-
-  if (!userAccount?.$id) {
-    return data({ error: "You must be signed in to book a trip." }, { status: 401 });
-  }
-
-  const body: { tripId?: string } = await request.json();
-  const { tripId } = body;
-  const userId = userAccount.$id;
 
   if (!tripId) {
     return data({ error: "tripId is required." }, { status: 400 });

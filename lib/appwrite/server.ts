@@ -46,7 +46,8 @@ export function createSessionClient(request: Request) {
 export function createAdminClient() {
   const client = new Client()
     .setEndpoint(appwriteConfig.endpointUrl)
-    .setProject(appwriteConfig.projectId);
+    .setProject(appwriteConfig.projectId)
+    .setKey(import.meta.env.VITE_APPWRITE_API_KEY!);
   return {
     db: new Databases(client),
   };

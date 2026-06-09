@@ -55,15 +55,21 @@ clientLoader.hydrate = true as const;
 export function HydrateFallback() {
   return (
     <div className="flex items-center justify-center min-h-screen bg-light-200">
-      <div className="flex flex-col items-center gap-3">
-        <div className="size-10 rounded-full bg-primary-100/30 animate-pulse" />
-        <div className="h-3 w-36 bg-gray-200 rounded animate-pulse" />
-      </div>
+      <img
+        src="/assets/icons/logo.svg"
+        alt="Teal Horizon"
+        className="h-12 w-auto animate-pulse"
+      />
     </div>
   );
 }
 
 export const links: Route.LinksFunction = () => [
+  { rel: "icon", href: "/favicon.ico", sizes: "48x48" },
+  { rel: "icon", href: "/favicon.svg", type: "image/svg+xml" },
+  { rel: "icon", href: "/favicon-96x96.png", sizes: "96x96", type: "image/png" },
+  { rel: "apple-touch-icon", href: "/apple-touch-icon.png", sizes: "180x180" },
+  { rel: "manifest", href: "/site.webmanifest" },
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
   {
     rel: "preconnect",

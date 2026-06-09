@@ -1,6 +1,6 @@
 import { ID, Query } from "appwrite";
 import { db, appwriteConfig } from "./client";
-import { createSessionClient } from "./server";
+import { createAdminClient, createSessionClient } from "./server";
 
 export interface Booking {
   $id: string;
@@ -24,7 +24,6 @@ export async function createBooking(
   trip: { id: string; name: string; imageUrls: string[]; location: any; estimatedPrice: string },
   sessionId: string,
 ) {
-  // Guard against duplicate bookings: if the user already booked this trip, return the existing one
   const { documents: existing } = await db.listDocuments(
     BOOKINGS().databaseId,
     BOOKINGS().collectionId,
@@ -55,7 +54,6 @@ export async function createBooking(
       tripImage: trip.imageUrls?.[0] ?? "",
       tripLocation,
       price: trip.estimatedPrice ?? "",
-      // sessionId,
       status: "confirmed",
     },
   );
@@ -88,12 +86,14 @@ export async function hasUserBookedTrip(accountId: string, tripId: string) {
 }
 
 export async function getServerUserBookings(request: Request) {
+  const { db: adb } = createAdminClient();
+
   try {
-    const { account, db: sdb } = createSessionClient(request);
+    const { account } = createSessionClient(request);
     const userAccount = await account.get();
     if (!userAccount?.$id) return [] as Booking[];
 
-    const { documents } = await sdb.listDocuments(
+    const { documents } = await adb.listDocuments(
       appwriteConfig.databaseId,
       appwriteConfig.bookingsCollections,
       [Query.equal("userId", userAccount.$id), Query.orderDesc("$createdAt")],

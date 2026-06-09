@@ -1,4 +1,4 @@
-import { Link, useNavigation, type MetaFunction } from "react-router";
+import { Link, redirect, useNavigation, type MetaFunction } from "react-router";
 import { getUser } from "lib/appwrite/auth";
 import { getUserBookings, getServerUserBookings, type Booking } from "lib/appwrite/bookings";
 import { EmptyState, TripCardSkeleton } from "~/components";
@@ -16,6 +16,7 @@ export async function loader({ request }: Route.LoaderArgs) {
 
 export async function clientLoader({ serverLoader }: Route.ClientLoaderArgs) {
   const serverData = await serverLoader();
+
   if (serverData.bookings.length > 0) return serverData;
 
   try {
@@ -24,12 +25,12 @@ export async function clientLoader({ serverLoader }: Route.ClientLoaderArgs) {
       result && !(result instanceof Response) && "accountId" in result
         ? (result as unknown as { accountId: string })
         : null;
-    if (!user) return { bookings: [] as Booking[] };
+    if (!user) return redirect("/");
 
     const bookings = await getUserBookings(user.accountId);
     return { bookings };
   } catch {
-    return { bookings: [] as Booking[] };
+    return redirect("/");
   }
 }
 

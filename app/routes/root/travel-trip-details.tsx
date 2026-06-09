@@ -148,7 +148,7 @@ export default function TravelTripDetails({
       const res = await fetch("/api/create-booking", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ tripId: trip.id }),
+        body: JSON.stringify({ tripId: trip.id, userId: uid }),
         credentials: "include",
       });
       const data = await res.json();
