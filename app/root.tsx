@@ -15,6 +15,7 @@ import { getServerUserDocument } from "lib/appwrite/server";
 import { syncSessionToCookie } from "lib/appwrite/session-cookie";
 import { appwriteConfig, account } from "lib/appwrite/client";
 import { getExistingUser } from "lib/appwrite/auth";
+import { Toaster } from "~/components/ui/sonner";
 import type { Route } from "./+types/root";
 import "./app.css";
 
@@ -122,6 +123,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         {children}
         <ScrollRestoration />
         <Scripts />
+        <Toaster />
       </body>
     </html>
   );

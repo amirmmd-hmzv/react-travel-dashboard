@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useRevalidator } from "react-router";
+import { toast } from "sonner";
 import { logoutUser } from "lib/appwrite/auth";
 import { useUser } from "~/hooks/useCurrentUser";
 import {
@@ -41,9 +42,11 @@ const LogoutConfirmDialog = ({
       await logoutUser();
       setUser(null);
       onOpenChange(false);
+      toast.success("Logged out successfully");
       revalidator.revalidate();
     } catch (error) {
       console.error("Error logging out:", error);
+      toast.error("Failed to log out. Please try again.");
       setIsLoggingOut(false);
     }
   };

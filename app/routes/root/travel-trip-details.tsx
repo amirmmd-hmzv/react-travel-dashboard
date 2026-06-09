@@ -1,6 +1,7 @@
 // travel-trip-details.tsx
 import { Link, useNavigate, type MetaFunction } from "react-router";
 import { useState, useEffect } from "react";
+import { toast } from "sonner";
 import {
   getServerTripById,
   mapAppwriteTrips,
@@ -154,11 +155,14 @@ export default function TravelTripDetails({
       if (!res.ok) throw new Error(data.error);
       if (data.alreadyBooked) {
         setAlreadyBooked(true);
+        toast.info("You've already booked this trip");
       } else {
+        toast.success("Trip booked successfully!");
         navigate(`/payment/success?sessionId=${data.sessionId}&tripId=${trip.id}`);
       }
     } catch {
       setBooking(false);
+      toast.error("Failed to book trip. Please try again.");
     }
   }
 

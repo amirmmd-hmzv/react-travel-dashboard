@@ -8,6 +8,7 @@ import { Button } from "~/components/ui/button";
 import { LuLoader } from "react-icons/lu";
 import { HiSparkles } from "react-icons/hi";
 import { useNavigate } from "react-router";
+import { toast } from "sonner";
 import type { Country, TripFormData, CreateTripResponse } from "~/types";
 
 interface CountryOption {
@@ -119,10 +120,14 @@ const CreateTrip = () => {
       });
 
       const result: CreateTripResponse = await response.json();
-      if (result?.id) navigate(`/admin/trips/${result.id}`);
+      if (result?.id) {
+        toast.success("Trip created successfully!");
+        navigate(`/admin/trips/${result.id}`);
+      }
       setError(null);
     } catch (error) {
       console.error("Error creating trip:", error);
+      toast.error("Failed to create trip. Please try again.");
     } finally {
       setLoading(false);
     }
