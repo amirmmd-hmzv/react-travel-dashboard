@@ -1,6 +1,6 @@
 import { ID, Query } from "appwrite";
 import { Query as ServerQuery } from "node-appwrite";
-import { OAuthProvider, account, db, appwriteConfig } from "../appwrite/client";
+import { OAuthProvider, account, db, appwriteConfig } from "./client";
 import { listAdminDocuments } from "./server";
 import { redirect } from "react-router";
 
@@ -126,23 +126,6 @@ export const getUser = async () => {
   } catch (error) {
     console.error("Error fetching user:", error);
     return null;
-  }
-};
-
-export const getAllUsers = async (limit: number, offset: number) => {
-  try {
-    const { documents: users, total } = await db.listDocuments(
-      appwriteConfig.databaseId,
-      appwriteConfig.usersCollections,
-      [Query.limit(limit), Query.offset(offset)],
-    );
-
-    if (total === 0) return { users: [], total };
-
-    return { users, total };
-  } catch (e) {
-    console.error("Error fetching users", e);
-    return { users: [], total: 0 };
   }
 };
 

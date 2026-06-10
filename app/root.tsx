@@ -11,24 +11,19 @@ import {
   type ClientLoaderFunctionArgs,
 } from "react-router";
 import { UserProvider } from "~/hooks/useCurrentUser";
-import { getServerUserDocument } from "lib/appwrite/server";
-import { appwriteConfig } from "lib/appwrite/client";
+import { appwriteConfig } from "lib/appwrite/config";
 import { getClientUser } from "lib/client-user";
 import { Toaster } from "~/components/ui/sonner";
 import type { Route } from "./+types/root";
 import "./app.css";
 
-export async function loader({ request }: LoaderFunctionArgs) {
-  try {
-    const userDoc = await getServerUserDocument(request);
-    return { currentUser: userDoc };
-  } catch {
-    return { currentUser: null };
-  }
+export async function loader() {
+  return { currentUser: null };
 }
 
 export async function clientLoader({ serverLoader }: ClientLoaderFunctionArgs) {
   const serverData = await serverLoader<Awaited<ReturnType<typeof loader>>>();
+  console.log(serverData, "serverData");
   if (serverData?.currentUser) return serverData;
 
   const currentUser = await getClientUser();
@@ -118,7 +113,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         {children}
         <ScrollRestoration />
         <Scripts />
-        <Toaster />
+        <Toaster position="top-center" />
       </body>
     </html>
   );
@@ -128,6 +123,7 @@ export default function App() {
   const { currentUser } = useLoaderData() as {
     currentUser: Record<string, any> | null;
   };
+
 
   return (
     <UserProvider user={currentUser}>

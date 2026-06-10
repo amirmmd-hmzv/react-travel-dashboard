@@ -10,6 +10,7 @@ import {
   TableCell,
   TableCaption,
 } from "~/components/ui/table";
+import { TableSkeleton } from "./SkeletonCell";
 
 /* =========================
    Types
@@ -63,6 +64,7 @@ export interface CustomTableProps<T extends Record<string, unknown>> {
   emptyMessage?: string | ReactNode;
   loadingMessage?: string | ReactNode;
   loading?: boolean;
+  skeletonRows?: number;
 
   actions?: TableAction<T>[];
   showActions?: boolean;
@@ -72,7 +74,6 @@ export interface CustomTableProps<T extends Record<string, unknown>> {
   onRowClick?: (row: T, index: number) => void;
   onRowDoubleClick?: (row: T, index: number) => void;
 
-  /* ✅ FIX اصلی اینجاست */
   selectable?: boolean;
   rowIdKey: keyof T;
   selectedRows?: Set<T[keyof T]>;
@@ -108,8 +109,8 @@ export function CustomTable<T extends Record<string, unknown>>({
   compact = false,
 
   emptyMessage = "No data to display",
-  loadingMessage = "Loading...",
   loading = false,
+  skeletonRows = 5,
 
   actions = [],
   showActions = false,
@@ -147,11 +148,8 @@ export function CustomTable<T extends Record<string, unknown>>({
       classes.push("border-0! border-none! border-transparent!");
     }
 
-    if (striped && index % 2 === 1) classes.push(" bg-white");
-    if (striped && index % 2 === 0) classes.push("bg-primary-50  ");
-
-    // if (hoverable && index % 2 === 1) classes.push("hover:bg-white/50");
-    // if (hoverable && index % 2 === 0) classes.push("hover:bg-primary-50/50");
+    if (striped && index % 2 === 1) classes.push("bg-white");
+    if (striped && index % 2 === 0) classes.push("bg-primary-50");
 
     if (hoverable) classes.push("hover:bg-gray-100/5");
 
@@ -167,15 +165,13 @@ export function CustomTable<T extends Record<string, unknown>>({
   };
 
   /* =========================
-     Selection Logic (FIXED)
+     Selection Logic
   ========================= */
 
   const handleSelectAll = (checked: boolean) => {
     if (!onSelectionChange) return;
-
     if (checked) {
-      const allIds = new Set<T[keyof T]>(data.map((row) => row[rowIdKey]));
-      onSelectionChange(allIds);
+      onSelectionChange(new Set<T[keyof T]>(data.map((row) => row[rowIdKey])));
     } else {
       onSelectionChange(new Set());
     }
@@ -183,10 +179,8 @@ export function CustomTable<T extends Record<string, unknown>>({
 
   const handleSelectRow = (row: T, checked: boolean) => {
     if (!onSelectionChange) return;
-
     const newSelection = new Set(selectedRows);
     const rowId = row[rowIdKey];
-
     checked ? newSelection.add(rowId) : newSelection.delete(rowId);
     onSelectionChange(newSelection);
   };
@@ -198,11 +192,11 @@ export function CustomTable<T extends Record<string, unknown>>({
     data.some((row) => selectedRows.has(row[rowIdKey])) && !allSelected;
 
   /* =========================
-     Render
+     Wrapper (shared between loading & normal)
   ========================= */
 
-  return (
-    <div className={`space-y-4  ${className}`}>
+  const Wrapper = ({ children }: { children: ReactNode }) => (
+    <div className={`space-y-4 ${className}`}>
       {(title || description) && (
         <div className="space-y-1">
           {title && <h2 className="text-2xl font-bold">{title}</h2>}
@@ -211,136 +205,159 @@ export function CustomTable<T extends Record<string, unknown>>({
           )}
         </div>
       )}
-
       <div className={`rounded-md ${bordered ? "bg-light-200" : ""}`}>
-        <Table className={tableClassName}>
-          {caption && <TableCaption>{caption}</TableCaption>}
+        {children}
+      </div>
+    </div>
+  );
 
-          <TableHeader className={headerClassName}>
-            <TableRow
-              className={`${borderRowBody ? "border-b border-light-200!" : "border-0!"} p-2 `}
-            >
-              {selectable && (
-                <TableHead className={`w-12 ${compact ? "py-2" : ""}`}>
-                  <input
-                    type="checkbox"
-                    checked={allSelected}
-                    ref={(el) => {
-                      if (el) el.indeterminate = someSelected;
-                    }}
-                    onChange={(e) => handleSelectAll(e.target.checked)}
-                  />
-                </TableHead>
-              )}
+  /* =========================
+     Loading → Skeleton
+  ========================= */
 
-              {columns.map((col, i) => (
-                <TableHead
-                  key={i}
-                  className={`font-semibold! ${borderRowBody ? "border-b border-light-200!" : "border-0!"}  tracking-wider bg-white  ${getAlignClass(col.align)} ${compact ? "py-4!" : ""}`}
-                  style={{
-                    width: col.width,
-                    minWidth: col.minWidth,
-                    maxWidth: col.maxWidth,
-                    ...col.headerStyle,
+  if (loading) {
+    return (
+      <Wrapper>
+        <TableSkeleton
+          rows={skeletonRows}
+          columns={columns.length}
+          selectable={selectable}
+          showActions={showActions && actions.length > 0}
+        />
+      </Wrapper>
+    );
+  }
+
+  /* =========================
+     Render
+  ========================= */
+
+  return (
+    <Wrapper>
+      <Table className={tableClassName}>
+        {caption && <TableCaption>{caption}</TableCaption>}
+
+        <TableHeader className={headerClassName}>
+          <TableRow
+            className={`${borderRowBody ? "border-b border-light-200!" : "border-0!"} p-2`}
+          >
+            {selectable && (
+              <TableHead className={`w-12 ${compact ? "py-2" : ""}`}>
+                <input
+                  type="checkbox"
+                  checked={allSelected}
+                  ref={(el) => {
+                    if (el) el.indeterminate = someSelected;
                   }}
-                >
-                  {col.header}
-                </TableHead>
-              ))}
-
-              {showActions && actions.length > 0 && (
-                <TableHead
-                  className="text-center"
-                  style={{ width: actionsWidth }}
-                >
-                  {actionsHeader}
-                </TableHead>
-              )}
-            </TableRow>
-          </TableHeader>
-
-          <TableBody className={bodyClassName}>
-            {loading ? (
-              <TableRow className="border-0!">
-                <TableCell colSpan={999} className="text-center py-8 border-0! whitespace-normal">
-                  {loadingMessage}
-                </TableCell>
-              </TableRow>
-            ) : data.length === 0 ? (
-              <TableRow className="border-0!">
-                <TableCell colSpan={999} className="text-center py-8 border-0!">
-                  {emptyMessage}
-                </TableCell>
-              </TableRow>
-            ) : (
-              data.map((row, rowIndex) => (
-                <TableRow
-                
-                  key={String(row[rowIdKey])}
-                  className={getRowClassName(row, rowIndex)}
-                  onClick={() => onRowClick?.(row, rowIndex)}
-                  onDoubleClick={() => onRowDoubleClick?.(row, rowIndex)}
-                >
-                  {selectable && (
-                    <TableCell>
-                      <input
-                        type="checkbox"
-                        checked={selectedRows.has(row[rowIdKey])}
-                        onChange={(e) => handleSelectRow(row, e.target.checked)}
-                        onClick={(e) => e.stopPropagation()}
-                      />
-                    </TableCell>
-                  )}
-
-                  {columns.map((col, i) => (
-                    <TableCell key={i} className={getAlignClass(col.align)}>
-                      {col.render
-                        ? col.render(row[col.key], row, rowIndex)
-                        : String(row[col.key] ?? "")}
-                    </TableCell>
-                  ))}
-
-                  {showActions && actions.length > 0 && (
-                    <TableCell className="text-center">
-                      <div className="flex justify-center gap-2">
-                        {actions.map((action, i) =>
-                          action.show?.(row) === false ? null : (
-                            <button
-                              key={i}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                action.onClick(row, rowIndex);
-                              }}
-                              className={
-                                action.className ??
-                                "px-3 py-1 text-xs rounded bg-primary text-primary-foreground"
-                              }
-                            >
-                              {action.label}
-                            </button>
-                          )
-                        )}
-                      </div>
-                    </TableCell>
-                  )}
-                </TableRow>
-              ))
+                  onChange={(e) => handleSelectAll(e.target.checked)}
+                />
+              </TableHead>
             )}
-          </TableBody>
 
-          {showFooter && (
-            <TableFooter className={footerClassName}>
-              <TableRow>
-                {footerContent ?? (
-                  <TableCell colSpan={999}>
-                    جمع کل: {data.length} ردیف
+            {columns.map((col, i) => (
+              <TableHead
+                key={i}
+                className={`font-semibold! ${borderRowBody ? "border-b border-light-200!" : "border-0!"} tracking-wider bg-white ${getAlignClass(col.align)} ${compact ? "py-4!" : ""} ${col.headerClassName ?? ""}`}
+                style={{
+                  width: col.width,
+                  minWidth: col.minWidth,
+                  maxWidth: col.maxWidth,
+                  ...col.headerStyle,
+                }}
+              >
+                {col.header}
+              </TableHead>
+            ))}
+
+            {showActions && actions.length > 0 && (
+              <TableHead
+                className="text-center"
+                style={{ width: actionsWidth }}
+              >
+                {actionsHeader}
+              </TableHead>
+            )}
+          </TableRow>
+        </TableHeader>
+
+        <TableBody className={bodyClassName}>
+          {data.length === 0 ? (
+            <TableRow className="border-0!">
+              <TableCell colSpan={999} className="text-center py-8 border-0!">
+                {emptyMessage}
+              </TableCell>
+            </TableRow>
+          ) : (
+            data.map((row, rowIndex) => (
+              <TableRow
+                key={String(row[rowIdKey])}
+                className={getRowClassName(row, rowIndex)}
+                onClick={() => onRowClick?.(row, rowIndex)}
+                onDoubleClick={() => onRowDoubleClick?.(row, rowIndex)}
+              >
+                {selectable && (
+                  <TableCell>
+                    <input
+                      type="checkbox"
+                      checked={selectedRows.has(row[rowIdKey])}
+                      onChange={(e) => handleSelectRow(row, e.target.checked)}
+                      onClick={(e) => e.stopPropagation()}
+                    />
+                  </TableCell>
+                )}
+
+                {columns.map((col, i) => (
+                  <TableCell
+                    key={i}
+                    className={`${getAlignClass(col.align)} ${col.cellClassName ?? ""}`}
+                    style={col.cellStyle}
+                  >
+                    {col.render
+                      ? col.render(row[col.key], row, rowIndex)
+                      : String(row[col.key] ?? "")}
+                  </TableCell>
+                ))}
+
+                {showActions && actions.length > 0 && (
+                  <TableCell className="text-center">
+                    <div className="flex justify-center gap-2">
+                      {actions.map((action, i) =>
+                        action.show?.(row) === false ? null : (
+                          <button
+                            key={i}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              action.onClick(row, rowIndex);
+                            }}
+                            className={
+                              action.className ??
+                              "px-3 py-1 text-xs rounded bg-primary text-primary-foreground"
+                            }
+                          >
+                            {action.label}
+                          </button>
+                        )
+                      )}
+                    </div>
                   </TableCell>
                 )}
               </TableRow>
-            </TableFooter>
+            ))
           )}
-        </Table>
-      </div>
-    </div>
+        </TableBody>
+
+        {showFooter && (
+          <TableFooter className={footerClassName}>
+            <TableRow>
+              {footerContent ?? (
+                <TableCell colSpan={999}>
+                  جمع کل: {data.length} ردیف
+                </TableCell>
+              )}
+            </TableRow>
+          </TableFooter>
+        )}
+      </Table>
+    </Wrapper>
   );
 }

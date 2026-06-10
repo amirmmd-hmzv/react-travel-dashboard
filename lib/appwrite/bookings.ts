@@ -1,6 +1,5 @@
 import { ID, Query } from "appwrite";
 import { db, appwriteConfig } from "./client";
-import { createAdminClient, createSessionClient } from "./server";
 
 export interface Booking {
   $id: string;
@@ -85,21 +84,4 @@ export async function hasUserBookedTrip(accountId: string, tripId: string) {
   return documents.length > 0;
 }
 
-export async function getServerUserBookings(request: Request) {
-  const { db: adb } = createAdminClient();
 
-  try {
-    const { account } = createSessionClient(request);
-    const userAccount = await account.get();
-    if (!userAccount?.$id) return [] as Booking[];
-
-    const { documents } = await adb.listDocuments(
-      appwriteConfig.databaseId,
-      appwriteConfig.bookingsCollections,
-      [Query.equal("userId", userAccount.$id), Query.orderDesc("$createdAt")],
-    );
-    return documents as unknown as Booking[];
-  } catch {
-    return [] as Booking[];
-  }
-}

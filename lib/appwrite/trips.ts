@@ -1,7 +1,6 @@
-import { Query } from "appwrite";
-import { Query as ServerQuery } from "node-appwrite";
+import { Query } from "node-appwrite";
 import { parseTripData } from "lib/utils";
-import { appwriteConfig, db } from "./client";
+import { appwriteConfig } from "./config";
 import { createAdminClient } from "./server";
 import type { Trip } from "app/types";
 
@@ -27,58 +26,28 @@ export const mapAppwriteTrip = (doc: AppwriteTripDocument): Trip | null => {
 export const mapAppwriteTrips = (docs: AppwriteTripDocument[]): Trip[] =>
   docs.map(mapAppwriteTrip).filter((trip): trip is Trip => trip !== null);
 
-/** Admin/dashboard loaders — uses node-appwrite on the server. */
-export const getAllTrips = async (limit: number, offset: number) =>
-  getServerTrips(limit, offset);
-
-/** Admin trip detail — uses node-appwrite on the server. */
-export const getTripById = async (tripId: string) =>
-  getServerTripById(tripId);
-
-/**
- * Get count of trips created by a specific user
- * @param userId - The user's account ID
- * @returns Number of trips created by the user
- */
-export const getTripCountByUser = async (userId: string): Promise<number> => {
+export const getServerTrips = async (limit: number, offset: number) => {
   try {
-    if (!userId) return 0;
-
-    const { total } = await db.listDocuments(
-      appwriteConfig.databaseId,
-      appwriteConfig.tripsCollections,
-      [Query.equal("userId", userId)],
-    );
-
-    return total || 0;
-  } catch (error) {
-    console.error(`Error fetching trip count for user ${userId}:`, error);
-    return 0;
-  }
-};
-
-export async function getServerTrips(limit: number, offset: number) {
-  try {
-    const { db: sdb } = createAdminClient();
-    const { documents, total } = await sdb.listDocuments(
+    const { db } = createAdminClient();
+    const { documents, total } = await db.listDocuments(
       appwriteConfig.databaseId,
       appwriteConfig.tripsCollections,
       [
-        ServerQuery.limit(limit),
-        ServerQuery.offset(offset),
-        ServerQuery.orderDesc("$createdAt"),
+        Query.limit(limit),
+        Query.offset(offset),
+        Query.orderDesc("$createdAt"),
       ],
     );
     return { allTrips: documents as unknown as AppwriteTripDocument[], total };
   } catch {
     return { allTrips: [], total: 0 };
   }
-}
+};
 
-export async function getServerTripById(tripId: string) {
+export const getServerTripById = async (tripId: string) => {
   try {
-    const { db: sdb } = createAdminClient();
-    return await sdb.getDocument(
+    const { db } = createAdminClient();
+    return await db.getDocument(
       appwriteConfig.databaseId,
       appwriteConfig.tripsCollections,
       tripId,
@@ -86,4 +55,9 @@ export async function getServerTripById(tripId: string) {
   } catch {
     return null;
   }
-}
+};
+
+/** Alias used by admin dashboard routes. */
+export const getAllTrips = getServerTrips;
+/** Alias used by admin trip detail route. */
+export const getTripById = getServerTripById;

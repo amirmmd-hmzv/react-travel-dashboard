@@ -1,5 +1,4 @@
 import { storeUserData } from "lib/appwrite/auth";
-import { getServerUserDocument } from "lib/appwrite/server";
 import { getClientUser } from "lib/client-user";
 import {
   Outlet,

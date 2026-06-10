@@ -1,6 +1,6 @@
 import { type ActionFunctionArgs, data } from "react-router";
 import { ID, Query } from "node-appwrite";
-import { appwriteConfig } from "lib/appwrite/client";
+import { appwriteConfig } from "lib/appwrite/config";
 import { createAdminClient } from "lib/appwrite/server";
 
 export const action = async ({ request }: ActionFunctionArgs) => {

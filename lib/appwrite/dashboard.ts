@@ -1,6 +1,6 @@
 import { Query } from "node-appwrite";
 import { parseTripData } from "lib/utils";
-import { appwriteConfig } from "./client";
+import { appwriteConfig } from "./config";
 import { listAdminDocuments } from "./server";
 import type { DashboardStats } from "app/types";
 

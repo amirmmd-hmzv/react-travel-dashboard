@@ -1,6 +1,6 @@
 import { Link, redirect, useNavigation, type MetaFunction } from "react-router";
 import { getUser } from "lib/appwrite/auth";
-import { getUserBookings, getServerUserBookings, type Booking } from "lib/appwrite/bookings";
+import { getUserBookings, type Booking } from "lib/appwrite/bookings";
 import { EmptyState, TripCardSkeleton } from "~/components";
 import { formatDate } from "lib/utils";
 import type { Route } from "./+types/my-bookings";
@@ -9,9 +9,8 @@ export const meta: MetaFunction = () => [
   { title: "My Bookings — Teal Horizon" },
 ];
 
-export async function loader({ request }: Route.LoaderArgs) {
-  const bookings = await getServerUserBookings(request);
-  return { bookings };
+export async function loader() {
+  return { bookings: [] as Booking[] };
 }
 
 export async function clientLoader({ serverLoader }: Route.ClientLoaderArgs) {

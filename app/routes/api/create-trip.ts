@@ -1,7 +1,7 @@
 import { type ActionFunctionArgs, data } from "react-router";
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { appwriteConfig } from "lib/appwrite/client";
-import { createServerDocument, requireAdminUser } from "lib/appwrite/server";
+import { appwriteConfig } from "lib/appwrite/config";
+import { createDocument } from "lib/appwrite/server";
 import { parseMarkdownToJson } from "lib/utils";
 
 interface ActionBody {
@@ -11,18 +11,20 @@ interface ActionBody {
   interests?: string;
   budget?: string;
   groupType?: string;
+  userId?: string;
 }
 
 export const action = async ({ request }: ActionFunctionArgs) => {
-  const adminUser = await requireAdminUser(request);
-  console.log(adminUser)
-  if (!adminUser) {
-    return data({ error: "Admin access required." }, { status: 403 });
-  }
-
   const body: ActionBody = await request.json();
-  const { country, numberOfDays, travelStyle, interests, budget, groupType } =
-    body;
+  const {
+    country,
+    numberOfDays,
+    travelStyle,
+    interests,
+    budget,
+    groupType,
+    userId,
+  } = body;
 
   if (
     !country ||
@@ -106,15 +108,17 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
     const imageUrls = (await imageResponse.json()).results
       .slice(0, 3)
-      .map((result: { urls?: { regular?: string } }) => result.urls?.regular || null);
+      .map(
+        (result: { urls?: { regular?: string } }) =>
+          result.urls?.regular || null,
+      );
 
-    const result = await createServerDocument(
-      request,
+    const result = await createDocument(
       appwriteConfig.tripsCollections,
       {
         tripDetail: JSON.stringify(trip),
         imageUrls,
-        userId: adminUser.accountId,
+        userId,
       },
     );
 

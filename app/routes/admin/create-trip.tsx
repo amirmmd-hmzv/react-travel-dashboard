@@ -9,7 +9,8 @@ import { LuLoader } from "react-icons/lu";
 import { HiSparkles } from "react-icons/hi";
 import { useNavigate } from "react-router";
 import { toast } from "sonner";
-import { appwriteConfig } from "lib/appwrite/client";
+import { account, appwriteConfig } from "lib/appwrite/client";
+import { syncSessionToCookie } from "lib/appwrite/session-cookie";
 import type { Country, TripFormData, CreateTripResponse } from "~/types";
 
 interface CountryOption {
@@ -104,18 +105,21 @@ const CreateTrip = () => {
       setLoading(false);
       return;
     }
+    const user = await account.get();
+       if(!user.$id) {
+           console.error('User not authenticated');
+           setLoading(false)
+           return;
+       }
 
     try {
-      const raw = globalThis.localStorage?.getItem(
-        `a_session_${appwriteConfig.projectId}`,
-      );
-      const session = raw ? JSON.parse(raw).secret : null;
+      await syncSessionToCookie();
+
 
       const response = await fetch("/api/create-trip", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          ...(session ? { "X-Appwrite-Session": session } : {}),
         },
         credentials: "include",
         body: JSON.stringify({
@@ -125,6 +129,7 @@ const CreateTrip = () => {
           interests: formData.interest,
           budget: formData.budget,
           groupType: formData.groupType,
+          userId: user.$id,
         }),
       });
 
@@ -145,6 +150,12 @@ const CreateTrip = () => {
   const handleChange = (key: keyof TripFormData, value: string | number) => {
     setFormData({ ...formData, [key]: value });
   };
+
+useEffect(() => {
+  account.getSession("current")
+    .then(s => console.log("session:", s))
+    .catch(e => console.log("session error:", e))
+}, [])
   return (
     <main className="dashboard wrapper ">
       <Header

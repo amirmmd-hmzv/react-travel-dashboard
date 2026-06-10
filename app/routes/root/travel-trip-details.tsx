@@ -9,10 +9,7 @@ import {
 } from "lib/appwrite/trips";
 import { hasUserBookedTrip } from "lib/appwrite/bookings";
 import { getPillItems } from "lib/tripDetails";
-import { appwriteConfig } from "lib/appwrite/client";
-import { getServerUser, listServerDocuments, checkServerBooking } from "lib/appwrite/server";
 import { getClientUser } from "lib/client-user";
-import { Query } from "appwrite";                        
 import InfoPill from "~/components/trip/InfoPill";
 import { TripPills, StarRating } from "~/components";
 import Chip from "~/components/ui/chip";
@@ -36,32 +33,12 @@ export async function loader({ params, request }: Route.LoaderArgs) {
 
   const [trip] = mapAppwriteTrips([rawTrip as unknown as AppwriteTripDocument]);
 
-  // Try to get user server-side (works after the first load when cookie is set)
-  let currentUser = null;
-  try {
-    const userAccount = await getServerUser(request);
-    if (userAccount?.$id) {
-      const { documents } = await listServerDocuments(
-        request,
-        appwriteConfig.usersCollections,
-        [Query.equal("accountId", userAccount.$id), Query.limit(1)],
-      );
-      currentUser = documents?.[0] ?? null;
-    }
-  } catch {}
-
-  const alreadyBooked = currentUser
-    ? await checkServerBooking(request, currentUser.accountId, params.tripId)
-    : false;
-
-  return { trip, currentUser, alreadyBooked };
+  return { trip, currentUser: null, alreadyBooked: false };
 }
 
-export async function clientLoader({
-  serverLoader,
-}: Route.ClientLoaderArgs) {
+export async function clientLoader({ serverLoader }: Route.ClientLoaderArgs) {
   const serverData = await serverLoader();
-
+  console.log(serverData, "serverData");
   if (serverData.currentUser) return serverData;
 
   const currentUser = await getClientUser();
@@ -103,6 +80,7 @@ export default function TravelTripDetails({
   loaderData,
 }: Route.ComponentProps) {
   const { trip } = loaderData;
+  console.log(loaderData);
   const { user: currentUser } = useUser();
   const [alreadyBooked, setAlreadyBooked] = useState(loaderData.alreadyBooked);
 
@@ -145,7 +123,9 @@ export default function TravelTripDetails({
         toast.info("You've already booked this trip");
       } else {
         toast.success("Trip booked successfully!");
-        navigate(`/payment/success?sessionId=${data.sessionId}&tripId=${trip.id}`);
+        navigate(
+          `/payment/success?sessionId=${data.sessionId}&tripId=${trip.id}`,
+        );
       }
     } catch {
       setBooking(false);
