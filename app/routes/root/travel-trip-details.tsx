@@ -38,7 +38,6 @@ export async function loader({ params, request }: Route.LoaderArgs) {
 
 export async function clientLoader({ serverLoader }: Route.ClientLoaderArgs) {
   const serverData = await serverLoader();
-  console.log(serverData, "serverData");
   if (serverData.currentUser) return serverData;
 
   const currentUser = await getClientUser();
@@ -80,7 +79,6 @@ export default function TravelTripDetails({
   loaderData,
 }: Route.ComponentProps) {
   const { trip } = loaderData;
-  console.log(loaderData);
   const { user: currentUser } = useUser();
   const [alreadyBooked, setAlreadyBooked] = useState(loaderData.alreadyBooked);
 

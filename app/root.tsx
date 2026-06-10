@@ -23,7 +23,6 @@ export async function loader() {
 
 export async function clientLoader({ serverLoader }: ClientLoaderFunctionArgs) {
   const serverData = await serverLoader<Awaited<ReturnType<typeof loader>>>();
-  console.log(serverData, "serverData");
   if (serverData?.currentUser) return serverData;
 
   const currentUser = await getClientUser();

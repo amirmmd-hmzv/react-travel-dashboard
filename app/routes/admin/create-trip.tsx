@@ -151,11 +151,7 @@ const CreateTrip = () => {
     setFormData({ ...formData, [key]: value });
   };
 
-useEffect(() => {
-  account.getSession("current")
-    .then(s => console.log("session:", s))
-    .catch(e => console.log("session error:", e))
-}, [])
+
   return (
     <main className="dashboard wrapper ">
       <Header

@@ -4,7 +4,7 @@ import { AsyncTripGrid, EmptyState } from "~/components";
 import AppPagination from "~/components/AppPagination";
 import type { Route } from "./+types/trips-page";
 
-const LIMIT = 12;
+const LIMIT = 8;
 
 export const meta: MetaFunction = () => [
   { title: "Explore Trips — Teal Horizon" },
