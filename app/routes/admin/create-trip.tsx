@@ -9,10 +9,10 @@ import { LuLoader } from "react-icons/lu";
 import { HiSparkles } from "react-icons/hi";
 import { useNavigate } from "react-router";
 import { toast } from "sonner";
-import { account, appwriteConfig } from "lib/appwrite/client";
+import { account } from "lib/appwrite/client";
 import { syncSessionToCookie } from "lib/appwrite/session-cookie";
 import { useUser } from "~/hooks/useCurrentUser";
-import type { Country, TripFormData, CreateTripResponse } from "~/types";
+import type { Country, TripFormData } from "~/types";
 
 interface CountryOption {
   value: string;
@@ -28,8 +28,8 @@ const CreateTrip = () => {
   const { user } = useUser();
 
   const [formData, setFormData] = useState<TripFormData>({
-    country: countries[0]?.value || "",
-    cca3Country: countries[0]?.cca3 || "",
+    country: "",
+    cca3Country: "",
     duration: 0,
     budget: "",
     groupType: "",
@@ -72,15 +72,6 @@ const CreateTrip = () => {
       })),
     [countries],
   );
-  const mapData = [
-    {
-      country: formData.country,
-      color: "#EA382E",
-      coordinates:
-        countries.find((c: Country) => c.name == formData.country)
-          ?.coordinates || [],
-    },
-  ];
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -110,16 +101,16 @@ const CreateTrip = () => {
       setLoading(false);
       return;
     }
+
     const appwriteAccount = await account.get();
-       if(!appwriteAccount.$id) {
-           console.error('User not authenticated');
-           setLoading(false)
-           return;
-       }
+    if (!appwriteAccount.$id) {
+      console.error("User not authenticated");
+      setLoading(false);
+      return;
+    }
 
     try {
       await syncSessionToCookie();
-
 
       const response = await fetch("/api/create-trip", {
         method: "POST",
@@ -137,7 +128,6 @@ const CreateTrip = () => {
           userId: appwriteAccount.$id,
         }),
       });
-
 
       const result = await response.json();
       if (!response.ok) {
@@ -164,15 +154,14 @@ const CreateTrip = () => {
     setFormData({ ...formData, [key]: value });
   };
 
-
   return (
-    <main className="dashboard wrapper ">
+    <main className="dashboard wrapper">
       <Header
-        title={`Add New Trip`}
-        description={"View and edit trip plan details"}
+        title="Add New Trip"
+        description="View and edit trip plan details"
       />
 
-      <section className="mt-2.5  wrapper-md ">
+      <section className="mt-2.5 wrapper-md">
         <form className="trip-form" onSubmit={handleSubmit}>
           <div>
             <label htmlFor="country">Country</label>
@@ -181,7 +170,7 @@ const CreateTrip = () => {
               texts={{ placeholder: "Select a country" }}
               contentClassName="w-full"
               triggerClassName="w-full"
-              className="bg-transparent h-auto p-4 hover:bg-transparent! shadow-none  border w-full border-gray-100/20"
+              className="bg-transparent h-auto p-4 hover:bg-transparent! shadow-none border w-full border-gray-100/20"
               items={countryOptions}
               filterMode="startsWith"
               onChange={(value) => {
@@ -211,29 +200,26 @@ const CreateTrip = () => {
             />
           </div>
 
-          {selectItems.map((k, i) => {
-            return (
-              <div key={`cn-${i}`}>
-                <label htmlFor="type">{formatKey(k)}</label>
-                <Combobox
-                  loading={loadingCountries}
-                  texts={{ placeholder: `Select a ${formatKey(k)}` }}
-                  // id="country"
-                  contentClassName="w-full text-dark-100"
-                  triggerClassName="w-full"
-                  className="bg-transparent h-auto p-4 hover:bg-transparent! shadow-none  border w-full border-gray-100/20 "
-                  items={comboBoxItems[k].map((item) => ({
-                    value: item,
-                    label: item,
-                  }))}
-                  searchable={false}
-                  selectedTextClassName="text-gray-100 font-medium  "
-                  filterMode="startsWith"
-                  onChange={(value) => handleChange(k, value)}
-                />
-              </div>
-            );
-          })}
+          {selectItems.map((k, i) => (
+            <div key={`cn-${i}`}>
+              <label htmlFor="type">{formatKey(k)}</label>
+              <Combobox
+                loading={loadingCountries}
+                texts={{ placeholder: `Select a ${formatKey(k)}` }}
+                contentClassName="w-full text-dark-100"
+                triggerClassName="w-full"
+                className="bg-transparent h-auto p-4 hover:bg-transparent! shadow-none border w-full border-gray-100/20"
+                items={comboBoxItems[k].map((item) => ({
+                  value: item,
+                  label: item,
+                }))}
+                searchable={false}
+                selectedTextClassName="text-gray-100 font-medium"
+                filterMode="startsWith"
+                onChange={(value) => handleChange(k, value)}
+              />
+            </div>
+          ))}
 
           <div>
             <WorldMap
@@ -246,7 +232,7 @@ const CreateTrip = () => {
 
           <footer className="w-full px-6">
             <Button
-              size={"lg"}
+              size="lg"
               disabled={loading}
               type="submit"
               className="w-full flex items-center flex-row-reverse gap-2 text-base"
