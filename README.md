@@ -65,16 +65,16 @@
 <div align="center">
   <table>
     <tr>
-      <td><img src="public/assets/screenshots/1%20Dashboard.PNG" alt="Dashboard Overview" width="100%"></td>
-      <td><img src="public/assets/screenshots/2%20Dashboard.PNG" alt="Dashboard Charts" width="100%"></td>
+      <td><img src="public/assets/screenshots/Dashboard%20stats%20and%20trips.PNG" alt="Dashboard Stats and Trips" width="100%"></td>
+      <td><img src="public/assets/screenshots/Dashboard%20charts.PNG" alt="Dashboard Charts" width="100%"></td>
     </tr>
     <tr>
-      <td align="center"><em>Dashboard overview with stats</em></td>
-      <td align="center"><em>Analytics charts & tables</em></td>
+      <td align="center"><em>Dashboard overview with stats & trips grid</em></td>
+      <td align="center"><em>Analytics charts & user/trip tables</em></td>
     </tr>
     <tr>
-      <td><img src="public/assets/screenshots/3%20Dashboard.PNG" alt="Admin Trips" width="100%"></td>
-      <td><img src="public/assets/screenshots/4%20Dashboard.PNG" alt="User Management" width="100%"></td>
+      <td><img src="public/assets/screenshots/Dashboard%20trips%20page.PNG" alt="Dashboard Trips Page" width="100%"></td>
+      <td><img src="public/assets/screenshots/Dashboard%20list%20of%20users.PNG" alt="Dashboard List of Users" width="100%"></td>
     </tr>
     <tr>
       <td align="center"><em>Admin trip listing</em></td>
@@ -87,20 +87,20 @@
 <div align="center">
   <table>
     <tr>
-      <td><img src="public/assets/screenshots/1%20travel.PNG" alt="Landing Page" width="100%"></td>
-      <td><img src="public/assets/screenshots/2%20travel.PNG" alt="Trip Details" width="100%"></td>
+      <td><img src="public/assets/screenshots/hero%20landing%20.PNG" alt="Hero Landing" width="100%"></td>
+      <td><img src="public/assets/screenshots/rest%20of%20landing.PNG" alt="Rest of Landing" width="100%"></td>
     </tr>
     <tr>
-      <td align="center"><em>Landing page hero</em></td>
-      <td align="center"><em>Trip detail with itinerary</em></td>
+      <td align="center"><em>Landing page hero section</em></td>
+      <td align="center"><em>Landing page content sections</em></td>
     </tr>
     <tr>
-      <td><img src="public/assets/screenshots/3%20travel.PNG" alt="Browse Trips" width="100%"></td>
-      <td><img src="public/assets/screenshots/4%20travel.PNG" alt="My Bookings" width="100%"></td>
+      <td><img src="public/assets/screenshots/travel%20details%20page.PNG" alt="Travel Details Page" width="100%"></td>
+      <td><img src="public/assets/screenshots/travel%20bookings%20trips%20page.PNG" alt="Travel Bookings Trips Page" width="100%"></td>
     </tr>
     <tr>
-      <td align="center"><em>Browse all trips</em></td>
-      <td align="center"><em>My Bookings page</em></td>
+      <td align="center"><em>Travel trip detail with itinerary</em></td>
+      <td align="center"><em>Bookings and trips browsing</em></td>
     </tr>
   </table>
 </div>
