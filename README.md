@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="/assets/images/banner-readme.png" alt="Teal Horizon - AI-Powered Travel Platform" width="100%">
+  <img src="public/assets/images/banner-readme.png" alt="Teal Horizon - AI-Powered Travel Platform" width="100%">
 </p>
 
 <h1 align="center">🌍 Teal Horizon</h1>
@@ -65,16 +65,16 @@
 <div align="center">
   <table>
     <tr>
-      <td><img src="/assets/screenshots/1%20Dashboard.PNG" alt="Dashboard Overview" width="100%"></td>
-      <td><img src="/assets/screenshots/2%20Dashboard.PNG" alt="Dashboard Charts" width="100%"></td>
+      <td><img src="public/assets/screenshots/1%20Dashboard.PNG" alt="Dashboard Overview" width="100%"></td>
+      <td><img src="public/assets/screenshots/2%20Dashboard.PNG" alt="Dashboard Charts" width="100%"></td>
     </tr>
     <tr>
       <td align="center"><em>Dashboard overview with stats</em></td>
       <td align="center"><em>Analytics charts & tables</em></td>
     </tr>
     <tr>
-      <td><img src="/assets/screenshots/3%20Dashboard.PNG" alt="Admin Trips" width="100%"></td>
-      <td><img src="/assets/screenshots/4%20Dashboard.PNG" alt="User Management" width="100%"></td>
+      <td><img src="public/assets/screenshots/3%20Dashboard.PNG" alt="Admin Trips" width="100%"></td>
+      <td><img src="public/assets/screenshots/4%20Dashboard.PNG" alt="User Management" width="100%"></td>
     </tr>
     <tr>
       <td align="center"><em>Admin trip listing</em></td>
@@ -87,16 +87,16 @@
 <div align="center">
   <table>
     <tr>
-      <td><img src="/assets/screenshots/1%20travel.PNG" alt="Landing Page" width="100%"></td>
-      <td><img src="/assets/screenshots/2%20travel.PNG" alt="Trip Details" width="100%"></td>
+      <td><img src="public/assets/screenshots/1%20travel.PNG" alt="Landing Page" width="100%"></td>
+      <td><img src="public/assets/screenshots/2%20travel.PNG" alt="Trip Details" width="100%"></td>
     </tr>
     <tr>
       <td align="center"><em>Landing page hero</em></td>
       <td align="center"><em>Trip detail with itinerary</em></td>
     </tr>
     <tr>
-      <td><img src="/assets/screenshots/3%20travel.PNG" alt="Browse Trips" width="100%"></td>
-      <td><img src="/assets/screenshots/4%20travel.PNG" alt="My Bookings" width="100%"></td>
+      <td><img src="public/assets/screenshots/3%20travel.PNG" alt="Browse Trips" width="100%"></td>
+      <td><img src="public/assets/screenshots/4%20travel.PNG" alt="My Bookings" width="100%"></td>
     </tr>
     <tr>
       <td align="center"><em>Browse all trips</em></td>
