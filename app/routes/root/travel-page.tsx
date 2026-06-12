@@ -10,7 +10,10 @@ import CTABanner from "~/components/sections/CTABanner";
 
 export const meta: MetaFunction = () => [
   { title: "Teal Horizon — AI Travel Itineraries" },
-  { name: "description", content: "Plan your perfect journey with AI-powered travel itineraries." },
+  {
+    name: "description",
+    content: "Plan your perfect journey with AI-powered travel itineraries.",
+  },
 ];
 
 export async function loader() {

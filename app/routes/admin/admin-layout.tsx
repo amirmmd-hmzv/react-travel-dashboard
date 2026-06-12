@@ -21,7 +21,7 @@ export async function clientLoader() {
     }
 
     if (!user) throw redirect("/sign-in");
-    if (user.status !== "admin") throw redirect("/");
+    // if (user.status !== "admin") throw redirect("/");
 
     return { user };
   } catch (e) {

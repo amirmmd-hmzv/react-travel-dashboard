@@ -38,13 +38,11 @@ const SiteHeader = ({ currentUser }: SiteHeaderProps) => {
                 >
                   My Bookings
                 </Link>
-                {currentUser?.status === "admin" && (
-                  <Link to="/admin/dashboard">
-                    <Button className="hidden sm:inline-flex bg-primary-100 hover:bg-primary-500 text-white rounded-lg text-sm px-4 py-2">
-                      Dashboard
-                    </Button>
-                  </Link>
-                )}
+                <Link to="/admin/dashboard">
+                  <Button className="hidden sm:inline-flex bg-primary-100 hover:bg-primary-500 text-white rounded-lg text-sm px-4 py-2">
+                    Dashboard
+                  </Button>
+                </Link>
                 <div className="flex items-center gap-2">
                   <img
                     src={currentUser.imageUrl || ""}

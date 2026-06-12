@@ -11,6 +11,7 @@ import { useNavigate } from "react-router";
 import { toast } from "sonner";
 import { account, appwriteConfig } from "lib/appwrite/client";
 import { syncSessionToCookie } from "lib/appwrite/session-cookie";
+import { useUser } from "~/hooks/useCurrentUser";
 import type { Country, TripFormData, CreateTripResponse } from "~/types";
 
 interface CountryOption {
@@ -24,6 +25,7 @@ const CreateTrip = () => {
   const [countries, setCountries] = useState<Country[]>([]);
   const [loadingCountries, setLoadingCountries] = useState(true);
   const navigate = useNavigate();
+  const { user } = useUser();
 
   const [formData, setFormData] = useState<TripFormData>({
     country: countries[0]?.value || "",
@@ -36,19 +38,16 @@ const CreateTrip = () => {
   });
 
   useEffect(() => {
-    fetch(
-      "https://restcountries.com/v3.1/all?fields=name,flags,latlng,maps,cca3",
-    )
+    fetch("https://cdn.jsdelivr.net/npm/world-countries@5/countries.json")
       .then((res) => res.json())
       .then((data) => {
         const mapped = data
           .map((country: any) => ({
             name: country.name.common,
             cca3: country.cca3,
-            flag: country.flags.svg,
+            flag: `https://flagcdn.com/${country.cca2.toLowerCase()}.svg`,
             value: country.name.common,
             coordinates: country.latlng,
-            maps: country.maps.openStreetMaps,
           }))
           .sort((a: any, b: any) => a.name.localeCompare(b.name));
 
@@ -85,6 +84,12 @@ const CreateTrip = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    if (user?.status !== "admin") {
+      toast.error("Only admins can create trips");
+      return;
+    }
+
     setLoading(true);
 
     if (
@@ -105,8 +110,8 @@ const CreateTrip = () => {
       setLoading(false);
       return;
     }
-    const user = await account.get();
-       if(!user.$id) {
+    const appwriteAccount = await account.get();
+       if(!appwriteAccount.$id) {
            console.error('User not authenticated');
            setLoading(false)
            return;
@@ -129,19 +134,27 @@ const CreateTrip = () => {
           interests: formData.interest,
           budget: formData.budget,
           groupType: formData.groupType,
-          userId: user.$id,
+          userId: appwriteAccount.$id,
         }),
       });
 
-      const result: CreateTripResponse = await response.json();
+
+      const result = await response.json();
+      if (!response.ok) {
+        toast.error(result?.error || "Something went wrong");
+        setError(result?.error || null);
+        return;
+      }
+
       if (result?.id) {
         toast.success("Trip created successfully!");
         navigate(`/admin/trips/${result.id}`);
       }
       setError(null);
     } catch (error) {
-      console.error("Error creating trip:", error);
-      toast.error("Failed to create trip. Please try again.");
+      const message =
+        error instanceof Error ? error.message : "Failed to create trip";
+      toast.error(message);
     } finally {
       setLoading(false);
     }
