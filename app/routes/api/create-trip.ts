@@ -1,7 +1,7 @@
 import { type ActionFunctionArgs, data } from "react-router";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { appwriteConfig } from "lib/appwrite/config";
-import { createDocument } from "lib/appwrite/server";
+import { createDocument, incrementUserTripCount } from "lib/appwrite/server";
 import { parseMarkdownToJson } from "lib/utils";
 
 interface ActionBody {
@@ -122,6 +122,8 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       },
     );
 
+await incrementUserTripCount(String(userId));
+ 
     return data({ id: result.$id });
   } catch (e) {
     console.error("Error generating travel plan: ", e);

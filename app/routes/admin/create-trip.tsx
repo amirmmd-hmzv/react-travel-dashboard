@@ -109,6 +109,7 @@ const CreateTrip = () => {
       return;
     }
 
+  
     try {
       await syncSessionToCookie();
 

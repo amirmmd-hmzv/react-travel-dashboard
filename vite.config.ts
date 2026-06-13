@@ -7,6 +7,15 @@ import tsconfigPaths from "vite-tsconfig-paths";
 export default defineConfig((config) => {
   const env = loadEnv(config.mode, process.cwd(), "");
 
+  // Make non-VITE_ env vars available via process.env for server-side code
+  // (VITE_ vars are auto-exposed via import.meta.env, but secrets like
+  //  APPWRITE_API_KEY must NOT go to the client bundle via define)
+  for (const [key, value] of Object.entries(env)) {
+    if (!key.startsWith("VITE_") && !process.env[key]) {
+      process.env[key] = value;
+    }
+  }
+
   return {
     plugins: [
       tailwindcss(),
@@ -22,10 +31,5 @@ export default defineConfig((config) => {
       ),
     ],
 
-    define: {
-      "process.env.APPWRITE_API_KEY": JSON.stringify(env.APPWRITE_API_KEY),
-      "process.env.GOOGLE_AI_API_KEY": JSON.stringify(env.GOOGLE_AI_API_KEY),
-      "process.env.UNSPLASH_ACCESS_KEY": JSON.stringify(env.UNSPLASH_ACCESS_KEY),
-    },
   };
 });

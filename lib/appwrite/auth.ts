@@ -136,40 +136,30 @@ export const getUser = async () => {
  * @param offset - Number of users to skip
  * @returns Array of users with trip counts and total count
  */
+
+// بعد ✅ - مستقیم از tripCount field میخونه
 export const getAllUsersWithTripCount = async (
   limit: number,
   offset: number,
 ) => {
   try {
-    const [usersResult, tripsResult] = await Promise.all([
-      listAdminDocuments(appwriteConfig.usersCollections, [
+    const usersResult = await listAdminDocuments(
+      appwriteConfig.usersCollections,
+      [
         ServerQuery.limit(limit),
         ServerQuery.offset(offset),
-      ]),
-      listAdminDocuments(appwriteConfig.tripsCollections, [
-        ServerQuery.select(["userId"]),
-        ServerQuery.limit(5000),
-      ]),
-    ]);
+      ]
+    );
 
     if (usersResult.total === 0) return { users: [], total: 0 };
 
-    const tripCountByUser = tripsResult.documents.reduce(
-      (acc: Record<string, number>, trip) => {
-        const userId = trip.userId as string;
-        if (userId) acc[userId] = (acc[userId] || 0) + 1;
-        return acc;
-      },
-      {},
-    );
-
-    const usersWithCounts = usersResult.documents.map((user) => ({
+    const users = usersResult.documents.map((user) => ({
       ...(user as unknown as AppwriteUserDocument),
-      tripCount: tripCountByUser[user.accountId as string] ?? 0,
+      tripCount: (user.tripCount as number) ?? 0, // ← مستقیم از DB
     }));
 
     return {
-      users: usersWithCounts as AppwriteUserDocument[],
+      users: users as AppwriteUserDocument[],
       total: usersResult.total,
     };
   } catch (e) {
